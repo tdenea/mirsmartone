@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block layout %}
+<section id="about-gallery" class="contact contact-3 pt-100 pb-0">
+    <div class="container-fluid container-padding">
+        <div class="row align-items-stretch">
+            <div class="col-sm-12 col-md-12 col-lg-5 px-0 order-2 order-lg-1" style="background-image: url(/static/img/signori-sul-divano2.jpg); background-size: cover; background-position: center center;">
+                <img src="{% static 'img/signori-sul-divano2.jpg' %}" class="img-fluid d-lg-none" alt="img" >
+            </div>
+            <!-- .col-lg-6 end -->
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-5 mx-auto mt-100 mb-130 order-1 order-lg-2">
+                <h2 class="text-center tlt">{% trans 'Customer Service' %}</h2>
+                <form method="post" action="/send_customer_service/" class="contactForm mb-0" id="formCustomerService">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="{% trans 'Name' %}" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <input type="text" class="form-control" name="surname" id="surname" placeholder="{% trans 'Surname' %}" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <input type="tel" class="form-control" name="phone" id="phone" placeholder="{% trans 'Phone' %}" required>
+                        </div>
+                    </div>
+                   
+                    <div class="form-group mb-30">
+                        <textarea class="form-control pt-10" name="message" id="message" rows="2" placeholder="{% trans 'Your message here' %}" required></textarea>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-20">
+                        <input type="checkbox" class="custom-control-input" name="privacy" id="privacy" required>
+                        <label class="custom-control-label" for="privacy">{% blocktrans %}I give my consent to the processing of my personal data for marketing purposes and for commercial communications through different media, including electronic and telematic (e-mail, text message) and traditional (paper mail and telephone) channels. More details available on our <a href="/{{LANGUAGE_CODE}}/privacy-policy/" target="_blank">privacy policy page</a>{% endblocktrans %}</label>
+                      </div>
+                    <button type="submit" class="btn btn--primary btn--rounded" id="submitBtn">{% trans "SEND Message" %}</button>
+                </form>
+            </div>
+            <!-- .col-lg-6 end -->
+        </div>
+        <!-- .row end -->
+    </div>
+    <!-- .container end -->
+</section>
+<!-- #about gallery end -->
+
+<!-- #contact #1 end -->
+<div id='recaptcha' class="g-recaptcha" data-sitekey='6Ld-MgAiAAAAAFll4DjMvw4AV4RvFmx2xy1HIw_U' data-callback="onSubmit" data-size="invisible"></div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    $(document).on('submit', '#formCustomerService', function(e){
+      e.preventDefault();
+      if (!$('#name').val() || !$('#email').val() || !$('#phone').val() || !$('#message').val() || !$('#privacy').is(':checked')) {
+        alert("Compila tutti i campi!");
+      } else {
+        grecaptcha.execute();
+      }
+    });
+    function onSubmit(token){
+        $('#formCustomerService > #submitBtn').prop("disabled", true);
+        $.ajax({
+              type:'POST',
+              url:'/send_customer_service/',
+              data: {
+                recaptcha_response: token,
+                name: $('#formCustomerService #name').val(),
+                surname: $('#formCustomerService #surname').val(),
+                phone: $('#formCustomerService #phone').val(),
+                email: $('#formCustomerService #email').val(),
+                message: $('#formCustomerService #message').val(),
+                privacy: $('#formCustomerService #privacy').is(':checked'),
+                csrfmiddlewaretoken: $('#formCustomerService input[name=csrfmiddlewaretoken]').val()
+              },
+          })
+          .done(function(response) {
+            grecaptcha.reset();
+              if(response.error == 1){
+                $('#modalFormError').modal('show');
+              }else if(response.error == 2){
+                  alert( response.msg );
+              }else{
+                {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+                // Event facebook pixel
+                if(typeof fbq !== 'undefined'){
+                    fbq('track', 'Contact');
+                }
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'conversion', {'send_to': 'AW-10940014376/EI4OCKnUs8sDEKi-zeAo'});
+                }
+                {% endif %}
+                if(cc.allowedCategory('analytics_cookies')){
+                    contactCustomerServiceEventAnalytics(); // send event analytics
+                }
+                $('#modalFormContactOK').modal('show');
+                $('#formCustomerService').trigger("reset");
+              }
+              $('#formCustomerService > #submitBtn').prop("disabled", false);
+          })
+          .fail(function( jqXHR, textStatus ) {
+              $('#formCustomerService #submitBtn').prop("disabled", false);
+              $('#modalFormError').modal('show');
+              grecaptcha.reset();
+          });
+    }
+</script>
+{% endblock %}

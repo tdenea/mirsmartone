@@ -1,0 +1,37 @@
+{% extends "oscar/layout.html" %}
+{% load static i18n wagtailcore_tags %}
+
+{% block body_class %}textual{% endblock %}
+
+
+{% block layout %}
+<section id="page-title" class="mt-100 bg-lightBlue py-5">
+    <div class="container pt-5">
+        <ol class="breadcrumb mb-3">
+            <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="active">{{ page.translated_title }}</li>
+        </ol>
+        <h1 class="tlt">{{ page.translated_title }}</h1>
+    </div>
+</section>
+
+<section class="pt-0 overflow-hidden">
+    <div class="watch-face watch-face-bottomright position-absolute">
+        <div class="circle" style="--ca: -70deg"></div>
+        <div class="circle" style="--ca: -30deg"></div>
+        <div class="circle" style="--ca: 10deg"></div>
+        <div class="circle" style="--ca: 50deg"></div>
+        <div class="circle" style="--ca: 90deg"></div>
+        <div class="circle" style="--ca: 130deg"></div>
+        <div class="circle" style="--ca: 170deg"></div>
+        <div class="circle" style="--ca: 210deg"></div>
+        <div class="circle" style="--ca: 250deg"></div>
+    </div>
+    <div class="container">
+        <div class="text mt-80">
+            {{ page.translated_description|richtext }} 
+        </div>
+    </div>
+</section>
+
+{% endblock %}

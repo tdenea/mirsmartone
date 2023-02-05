@@ -1,0 +1,610 @@
+{% load i18n %}
+{% load static string_filters wagtailsettings_tags poll_extras %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_smartone as SMARTONE %}
+{% get_smartoneoxi as SMARTONEOXI %}
+{% get_set_turbina as SET_TURBINA %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-gb" }}" class="{% block html_class %}no-js{% endblock %}">
+    <head>
+        <title>{% block title %}{% if page.seo_title %}{{ page.translated_seo_title }}{% else %}{% if page.translated_title %}{{ page.translated_title }} | {% endif %}{{ shop_name }}{% endif %}{% endblock %}</title>
+
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="created" content="{% now "jS M Y h:i" %}" />
+        <meta name="description" content="{% block description %}{% if page.translated_search_description %}{{ page.translated_search_description }}{% else %}{% trans 'Peak flow meters with integrated oximeter. Record and store test results, trends and symptoms, all directly from your smartphone.' %}{% endif %}{% endblock %}" />
+        <meta name="viewport" content="{% block viewport %}width=device-width{% endblock %}" />
+
+        {% if request.META.HTTP_HOST != 'ux.mirsmartone.doppiozero.to' and request.META.HTTP_HOST != 'dev.mirsmartone.doppiozero.to' %}
+        <meta name="robots" content="index, follow">
+        {% else %}
+        <meta name="robots" content="noindex, nofollow">
+        {% endif %}
+
+        {% block hreflang %}
+        {% list_hreflang page.pk as list_url %}
+        {% for lang, url in list_url.items %}
+        <link rel="alternate" hreflang="{{ lang }}" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{url}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+        {% endfor %}
+        {% endblock %}
+
+        {% block favicon %}
+        <link rel="shortcut icon" href="/static/img/favicon/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/static/img/favicon/favicon.svg" type="image/svg+xml">
+        {% endblock %}
+
+        <!-- Meta Facebook e Twitter -->
+        <meta property="fb:app_id" content="1105513500081890" />
+        <meta property="og:site_name" content="MIR">
+        {% block extra_meta %}
+            {% block social_meta %}
+            <meta property="og:title" content="{% if page.translated_seo_title %}{{ page.translated_seo_title }}{% else %}{{ page.title }}{% endif %}{% with page.get_site.site_name as site_name %}{% if site_name %} | {{ site_name }}{% endif %}{% endwith %}">
+            <meta property="og:description" content="{% if page.translated_search_description %}{{ page.translated_search_description|truncatechars:160|safe }}{% else %}{% trans 'App-based personal Spirometer (PEF,FEV1) with embedded Oximeter (SpO2, Pulse)' %}{% endif %}">
+            {% endblock %}
+            {% block social_img %}
+            <meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'img/share.jpg' %}">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="800">
+            {% endblock %}
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ request.META.REQUEST_URI }}">
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:site" content="@mirmedical">
+        {% endblock %}
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&family=Mulish:wght@400;700&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Figtree&display=swap" rel="stylesheet">
+        
+        <!-- Merchant center verification-->
+        <meta name="google-site-verification" content="YGZGV4pFG1ASlTlGoIz0QYRWZzDVlZjoddNjHxNG9bc" />
+
+        {# Block where global CSS will go. #}
+        <link href="{% static 'css/cookieconsent.min.css' %}" rel="stylesheet">
+        <link href="{% static 'assets/aos/aos.css' %}" rel="stylesheet">
+        <link href="{% static 'assets/select2/css/select2.min.css' %}" rel="stylesheet">
+        <link href="{% static 'assets/toastr/toastr.min.css' %}" rel="stylesheet">
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous"> -->
+        <link href="{% static 'css/external.css' %}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{% static "oscar/css/fa.css" %}" />
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        <link href="{% static 'css/theme-mir.css' %}" rel="stylesheet">
+        <link href="{% static 'css/project.min.css' %}" rel="stylesheet">
+        
+        {% block styles %}{% endblock %}
+
+        {# Additional CSS - specific to certain pages #}
+        {% block extrastyles %}{% endblock %}
+
+        {% block extrahead %}{% endblock %}
+        
+    </head>
+
+    <body id="{% block body_id %}default{% endblock %}" class="{% block body_class %}default{% endblock %}">
+        {# Main content goes in this 'layout' block #}
+        
+        <div class="preloader">
+            <div class="loader-eclipse">
+                <div class="loader-content"></div>
+            </div>
+        </div>
+
+        <div id="" class="">
+            {% include "includes/header.html" %}
+
+            {% block layout %}{% endblock %}
+
+            {% include "includes/footer.html" %}
+        </div><!-- #wrapper end -->
+
+        {% block modal %}
+        {% endblock modal %}
+
+
+        <!-- modal menu -->
+        <div class="modal fade menu-popup menu-popup-2 modal-fullscreen" id="menu-popup" tabindex="-1" role="dialog" data-backdrop="static">
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="lnr lnr-cross"></i> CLOSE</button> -->
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body pt-100">
+                        <!-- <h3 class="popup--title text-center">{% trans "Products" %}</h3>
+                        <div class="menu--popup-cat text-center">
+                            <ul class="list-unstyled">
+                                <li><a href="">Smart One</a></li>
+                                <li><a href="">Smart One Oxi</a></li>
+                             </ul>
+                        </div> -->
+                        <div class="menu--popup-links text-center">
+                            <ul class="list-unstyled">
+                                {% get_smartone as SMARTONE %}
+                                <li class="pb-3 pb-lg-4"><a href="{{ SMARTONE.get_absolute_url }}">Smart One</a></li>
+                                <li class="py-3 py-lg-4"><a href="{{ SMARTONEOXI.get_absolute_url }}">Smart One Oxi</a></li>
+                                <li class="py-3 py-lg-4"><a href="{{ SET_TURBINA.get_absolute_url }}">{% trans "Set Turbina e Boccaglio di Ricambio" %}</a></li>
+                                <li class="py-3 py-lg-4"><a href="/{{ LANGUAGE_CODE }}/about/">{% trans "About us" %}</a></li>
+                                <!-- <li class="py-3 py-lg-4"><a href="#">Medical quality</a></li> -->
+                                <li class="pt-3 pt-lg-4"><a href="/{{ LANGUAGE_CODE }}/contacts/">{% trans "Contacts" %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-sm-4 col-md-3 col-lg-3 text-center text-sm-left">
+                                <div class="widget--content widget--content1 mb-40">
+                                    <h6>{% trans "Need help?" %}</h6>
+                                    <p style="margin-top: -5px">{% blocktrans %}Write to our <a href="/{{ LANGUAGE_CODE }}/customer-service/">customer service</a>{% endblocktrans %}</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3 widget2 text-center">
+                                <div class="widget--content widget--content2 mb-40">
+                                    <h6>{% trans "Follow" %}</h6>
+                                    <div class="social--icons d-flex align-items-center justify-content-center">
+                                        <a onclick="clickEventAnalytics('Facebook Icon');" class="facebook mr-20" href="https://www.facebook.com/mirsmartone" target="_blank" rel="noopener">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="15" height="27" fill="#f9b233"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+                                        </a>
+
+                                        <a onclick="clickEventAnalytics('Instagram Icon');" class="instagram mr-0" href="https://www.instagram.com/mir_smartone/" target="_blank" rel="noopener">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="24" height="27" fill="#f9b233"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-3 col-lg-3 widget--logo  text-center text-sm-left">
+                                <div class="widget--content widget--content3 mb-40">
+                                    <h6>{% trans "GUARANTEE" %}</h6>
+                                    <div class="widget--logo-img">
+                                        <img src="/static/img/mir-orange.svg" alt="logo" width="120">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-sm-none languages-mobile">
+                            {% include "includes/languages.html" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal Contact form success -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalFormContactOK">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header p-0 d-flex justify-content-end border-none">
+                        <button type="button" class="close custom-close m-0" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center pb-5">
+                        <h3>{% trans 'Grazie per averci contattato' %}</h3>
+                        <p class="pb-3">{% trans 'Ti risponderemo nel più breve tempo possibile.' %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal Contact form success -->
+        <!-- Modal Newsletter form success -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalFormNewsletterOK">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header p-0 d-flex justify-content-end border-none">
+                        <button type="button" class="close custom-close m-0" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center pb-5">
+                        <h3>{% trans 'Iscrizione avvenuta' %}</h3>
+                        <p class="pb-3">{% trans 'Grazie per esserti iscritto alla nostra newsletter. Periodicamente riceverai comunicazioni su Smart One, ti terremo aggiornato su tutte le novità e gli eventi.' %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal Newsletter form success -->
+        <!-- Modal contact form errror -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalFormError">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header p-0 d-flex justify-content-end border-none">
+                        <button type="button" class="close custom-close m-0" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center pb-5">
+                        <h3 class="text-danger">{% trans 'Spiacenti, si è verificato un errore.' %}</h3>
+                        <p class="pb-3">{% trans 'Per favore riprova più tardi.' %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal contact form errror -->
+
+        {# Scripts loaded from a CDN. #}
+        {% block cdn_scripts %}
+        <!-- jQuery -->
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script>window.jQuery || document.write('<script src="{% static "oscar/js/jquery/jquery.min.js" %}"><\/script>')</script>
+        {% endblock %}
+
+        {# Local scripts #}
+        {% block scripts %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <!-- <script src="{% static 'assets/lottie/lottie-player.js' %}"></script> -->
+        <script src="{% static 'assets/aos/aos.js' %}"></script>
+        <script src="{% static 'assets/toastr/toastr.min.js' %}"></script>
+        <script src="{% static 'assets/select2/js/select2.full.min.js' %}"></script>
+        <script src="{% static 'js/plugins.js' %}"></script>
+        <script src="{% static 'js/functions.js' %}"></script>
+        <script src="{% static 'js/project.js' %}?v=1"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/shortcuts/infinite.js"></script>
+        <script src="{% static 'assets/textillate/jquery.fittext.js' %}"></script>
+        <script src="{% static 'assets/textillate/jquery.lettering.js' %}"></script>
+        <script src="{% static 'assets/textillate/jquery.textillate.js' %}"></script>
+
+        {% endblock %}
+
+        {% block cookies %}
+        <script src="{% static 'js/cookieconsent.js' %}"></script>
+        {% endblock %}
+
+        {% block alertcripts %}
+        {% if messages %}
+        {% for message in messages %}
+        {% for tag in message.tags|split %}
+        {% if tag == 'success' %}
+        <script>toastr.success('{% spaceless %}{% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}{% endspaceless %}');</script>
+        {% elif tag == 'warning' %}
+        <script>toastr.warning('{% spaceless %}{% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}{% endspaceless %}');</script>
+        {% elif tag == 'error' %}
+        <script>toastr.error('{% spaceless %}{% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}{% endspaceless %}');</script>
+        {% elif tag == 'info' %}
+        <script>toastr.info('{% spaceless %}{% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}{% endspaceless %}');</script>
+        {% elif tag == 'debug' %}
+        <script>toastr.info('{% spaceless %}{% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}{% endspaceless %}');</script>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+        {% endif %}
+        {% endblock %}
+
+        {# Additional JS scripts #}
+        {% block extrascripts %}{% endblock %}
+
+        {# Block for body onload functions #}
+        <script>
+
+            AOS.init();
+
+            $(function() {
+                {% block onbodyload %}{% endblock %}
+            });
+        </script>
+        
+        {% block extra_js %}
+        {% endblock %}
+
+        <script>
+        {% block tracking %}
+        {# Default to using Google analytics #}
+        // Global variables
+        var gtag, referral, contactEventAnalytics, contactNewsletterEventAnalytics, contactCustomerServiceEventAnalytics, clickEventAnalytics;
+
+        // obtain cookieconsent plugin
+        var cc = initCookieConsent();
+
+        window.addEventListener('DOMContentLoaded', function() {
+            $(document).ready(function() {
+                
+            if(document.referrer.length > 0 && document.referrer.indexOf(document.location.origin) !== 0){
+                localStorage.setItem("referral", document.referrer);
+            }
+            
+            // run plugin with config object
+            cc.run({
+                gui_options: {
+                    consent_modal: {
+                        layout: 'box',               // box/cloud/bar
+                        position: 'top center',     // bottom/middle/top + left/right/center
+                        transition: 'zoom',           // zoom/slide
+                        swap_buttons: true            // enable to invert buttons
+                    },
+                    settings_modal: {
+                        layout: 'box',                 // box/bar
+                        // position: 'left',           // left/right
+                        transition: 'slide'            // zoom/slide
+                    }
+                },
+                force_consent: true,
+                page_scripts: true,
+                autorun : true,
+                delay : 0,
+                current_lang : document.documentElement.getAttribute('lang'),
+                autoclear_cookies : true, 
+                cookie_expiration : 182,
+                autoclear_cookies : true,
+                
+                onAccept: function(cookies){
+                    if(cc.allowedCategory('analytics_cookies')){
+                        attivaAnalytics();
+            
+                        //Google Tag Manager
+                        //attivaTagManager();
+                    }
+                    if(cc.allowedCategory('marketing_cookies')){
+                        {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+                        // Facebook Pixel Code
+                        attivaPixelFb()
+            
+                        // LinkedIn Pixel Code
+                        //attivaPixelLinkedin()
+            
+                        // Google Ads: XXXXXXXXX
+                        //attivaGoogleAds()
+                        {% endif %}
+                    }
+                    console.log('cookie necessari accettati!')
+                },
+            
+                onChange: function(cookies){
+                    if(cc.allowedCategory('analytics_cookies')){
+                        attivaAnalytics();
+            
+                        //Google Tag Manager
+                        //attivaTagManager();
+                    }else{
+                        console.log('cookie analytics disattivati')
+                    }
+            
+                    if(cc.allowedCategory('marketing_cookies')){
+                        {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+                        // Facebook Pixel Code
+                        attivaPixelFb()
+            
+                        // LinkedIn Pixel Code
+                        //attivaPixelLinkedin()
+            
+                        // Google Ads
+                        //attivaGoogleAds()
+                        {% endif %}
+                    }else{
+                        console.log('pixel di facebook e linkedin disattivato')
+                    }
+                },
+            
+                languages : {
+                    it : {	
+                        consent_modal : {
+                            title :  '<span class="mt-4 mt-sm-0 d-inline-block">Questo sito usa i cookie</span> <button class="btn-continua" type="button" data-cc="accept-necessary">Continua senza accettare</button>',
+                            description :  '<p>Oltre ai cookie strettamente necessari per il funzionamento di questo sito web, MIR Medical International Research utilizza cookie ed altri strumenti di tracciatura per ricordare le Sue preferenze nonché per valutare la performance di questo sito web.</p><p class="mt-2">Di seguito potrà esprimere le sue preferenze in relazione ai cookie o cliccando su "Accetta tutti i cookie" – al fine consentire gli utilizzi sopra citati – oppure potrà selezionarli individualmente cliccando su “Impostazioni cookie”. Qualora dovesse cliccare su “Continua senza accettare” – posto in alto a destra - chiuderà il banner e continuerà la navigazione in assenza di cookie o altri strumenti di tracciamento diversi da quelli tecnici.</p><p class="mt-2">Per maggiori informazioni su queste tecnologie e sul loro utilizzo in questo sito web, può consultare la nostra <a class="cc-link mt-2" href="/cookie-policy/"> Cookie Policy</a></p>',
+                            primary_btn: {
+                                text: 'Accetta tutti i cookie',
+                                role: 'accept_all'				//'accept_selected' or 'accept_all'
+                            },
+                            secondary_btn: {
+                                text : 'Impostazioni cookie',
+                                role : 'settings'				//'settings' or 'accept_necessary'
+                            },
+                        },
+                        settings_modal : {
+                            title : 'Preferenze sui cookie',
+                            save_settings_btn : "Salva impostazioni",
+                            accept_all_btn : "Accetto tutto",
+                            blocks : [
+                                {
+                                    title : "Utilizzo dei cookie",
+                                    description: 'Utilizziamo i cookie per garantire le funzionalità di base del sito web e migliorare la tua esperienza online. Puoi scegliere di attivare / disattivare ogni categoria ogni volta che lo desideri. '
+                                },{
+                                    title : "Cookie necessari",
+                                    description: 'Questi cookie sono essenziali per il corretto funzionamento del sito web. Senza questi cookie il sito web non funzionerebbe correttamente.',
+                                    toggle : {
+                                        value : 'necessary_cookies',
+                                        enabled : true,
+                                        readonly: true
+                                    }
+                                },{
+                                    title : "Cookie di Analytics",
+                                    description: 'Questi cookie raccolgono informazioni su come utilizzi il sito web, quali pagine hai visitato e su quali link hai cliccato. Tutti i dati sono resi anonimi e non possono essere utilizzati per identificarti. ',
+                                    toggle : {
+                                        value : 'analytics_cookies',
+                                        enabled : false,
+                                        readonly: false
+                                    },
+                                },
+                                {
+                                    title : "Cookie di Marketing",
+                                    description: 'Questi cookie servono per la raccolta e l’analisi di dati statistici al fine di misurare l’efficacia della pubblicità effettuata sui social network e su Google, monitorando le interazioni dell’utente.',
+                                    toggle : {
+                                        value : 'marketing_cookies',
+                                        enabled : false,
+                                        readonly: false
+                                    },
+                                },
+                                {
+                                    title : "Maggiori informazioni",
+                                    description: 'Per qualsiasi domanda in relazione alla nostra politica sui cookie e alle tue scelte puoi prendere visione della <a aria-label="Cookie policy" class="cc-link" href="/cookie-policy/">Cookie policy</a>.',
+                                }
+                            ]
+                        }
+                    },
+                    en : {	
+                        consent_modal : {
+                            title : '<span class="mt-4 mt-sm-0 d-inline-block">We use cookies</span><button class="btn-continua" type="button" data-cc="accept-necessary">Continue without accepting</button>',
+                            description :  '<p>In addition to the cookies strictly necessary for the functioning of this website, MIR Medical International Research uses cookies and other tracking tools to remember your preferences and to evaluate the performance of this website. </p> <p class="mt-2"> Below you can express your preferences in relation to cookies or by clicking on "Accept all cookies" - in order to allow the above-mentioned uses - or you can select them individually by clicking on "Cookie settings". If you click on "Continue without accepting" - located at the top right - you will close the banner and continue browsing in the absence of cookies or tracking tools other than technical ones. </p> <p class="mt-2"> For more information on these technologies and their use on this website, you can consult our <a class="cc-link mt-2" href="/cookie-policy/"> Cookie Policy </a> </ p>',
+                            primary_btn: {
+                                text: 'Accept all cookies',
+                                role: 'accept_all'				//'accept_selected' or 'accept_all'
+                            },
+                            secondary_btn: {
+                                text : 'Cookie settings',
+                                role : 'settings'				//'settings' or 'accept_necessary'
+                            },
+                        },
+                        settings_modal : {
+                            title : 'Cookie settings',
+                            save_settings_btn : "Save settings",
+                            accept_all_btn : "Accept all",
+                            blocks : [
+                                {
+                                    title : "Cookie usage",
+                                    description: 'We use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want.'
+                                },{
+                                    title : "Strictly necessary cookies",
+                                    description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly.',
+                                    toggle : {
+                                        value : 'necessary_cookies',
+                                        enabled : true,
+                                        readonly: true
+                                    }
+                                },{
+                                    title : "Analytics cookies",
+                                    description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you. ',
+                                    toggle : {
+                                        value : 'analytics_cookies',
+                                        enabled : false,
+                                        readonly: false
+                                    },
+                                },
+                                {
+                                    title : "Marketing cookies",
+                                    description: 'These cookies are used to collect statistical data in order to measure the effectiveness of advertising on social networks and Google, by monitoring user interactions. ',
+                                    toggle : {
+                                        value : 'marketing_cookies',
+                                        enabled : false,
+                                        readonly: false
+                                    },
+                                },
+                                {
+                                    title : "More information",
+                                    description: 'For any questions about our policy on cookies and your choices, you can read the <a aria-label="Cookie policy" class="cc-link" href="/cookie-policy/">Cookie policy</a>.',
+                                }
+                            ]
+                        }
+                    }
+                }
+            });
+            
+            
+            function attivaAnalytics(){
+            
+                referral = localStorage.getItem("referral");
+                if(referral !== null && typeof referral !== "undefined"){
+                    Object.defineProperty(document, "referrer", {get : function(){ return referral; }});
+                }
+                {% get_settings %}
+                {% if settings.home.SiteSettings.google_analytics_test or settings.home.SiteSettings.google_analytics_id %}
+                cc.loadScript('https://www.googletagmanager.com/gtag/js?id={% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}', function(){
+                    window.dataLayer = window.dataLayer || [];
+                    gtag = function(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+        
+                    gtag('config', '{% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}');
+                    {% block extratracking_gtag %}{% endblock %}
+                    console.log('cookie analytics accettati');
+                });
+                {% endif %}
+            }
+            
+            function attivaPixelFb(){
+                {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', 'XXXXXXXXXXXXXX');
+                fbq('track', 'PageView');
+                console.log('attivo pixel di facebook');
+
+                {% endif %}
+            }
+            
+            function attivaGoogleAds(){
+                cc.loadScript('https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXXXX', function(){
+                    window.dataLayer = window.dataLayer || [];
+                    gtag = function(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+            
+                    gtag('config', 'AW-XXXXXXXXXXX');
+                    console.log('google ads attivato')
+                });
+            }
+            
+            function attivaPixelLinkedin(){
+                _linkedin_partner_id = "XXXXXXX"; window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || []; window._linkedin_data_partner_ids.push(_linkedin_partner_id); 
+            
+                (function(l) { if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])}; window.lintrk.q=[]} var s = document.getElementsByTagName("script")[0]; var b = document.createElement("script"); b.type = "text/javascript";b.async = true; b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js"; s.parentNode.insertBefore(b, s);})(window.lintrk); 
+                
+                console.log('attivo pixel di Linkedin');
+            }
+            
+            function attivaTagManager(){
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GTM-XXXXXXXX');
+            }
+
+           
+
+            contactEventAnalytics = function(){
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'form', {
+                        'send_to': '{% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}',
+                        'event_category': 'FormContactSent',
+                        'event_label': 'Form Contact Sent',
+                        'value': '1'
+                    });
+                }
+            }
+            contactNewsletterEventAnalytics = function(){
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'form', {
+                        'send_to': '{% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}',
+                        'event_category': 'FormNewsletterSent',
+                        'event_label': 'Form Newsletter Sent',
+                        'value': '1'
+                    });
+                }
+            }
+            contactCustomerServiceEventAnalytics = function(){
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'form', {
+                        'send_to': '{% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}',
+                        'event_category': 'FormCustomerServiceSent',
+                        'event_label': 'Form Customer Service Sent',
+                        'value': '1'
+                    });
+                }
+            }
+            clickEventAnalytics = function(label){
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'click', {
+                        'send_to': '{% if request.META.HTTP_HOST == "mirsmartone.com" and settings.home.SiteSettings.google_analytics_id %}{{settings.home.SiteSettings.google_analytics_id}}{% else %}{% if settings.home.SiteSettings.google_analytics_test %}{{ settings.home.SiteSettings.google_analytics_test }}{% endif %}{% endif %}',
+                        'event_category': 'ClickButton',
+                        'event_label': label,
+                        'value': '1'
+                    });
+                }
+            }
+
+
+
+
+            $('.tlt').textillate({ in: { effect: 'fadeIn', delay: 20 } });
+
+            
+            {% block extratracking %}{% endblock %}
+            });
+        });
+        {% endblock %}
+        </script>
+
+        {# Page meta-data - this is populated by the 'metadata' template context processor #}
+    </body>
+</html>

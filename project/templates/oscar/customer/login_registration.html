@@ -1,0 +1,89 @@
+{% extends "oscar/layout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans 'Login or register' %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ homepage_url }}">{% trans 'Home' %}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans 'Login or register' %}</li>
+        </ol>
+    </nav> -->
+{% endblock %}
+
+{% block header_wrapper %}{% endblock %}
+{% block nav_accounts %}{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+
+
+<section id="register-login" class="mt-100 register-login pt-60 pb-150 overflow-hidden" >
+    <!-- <div class="watch-face watch-face-bottomleft position-absolute" >
+        <div class="circle" style="--ca: -70deg"></div>
+        <div class="circle" style="--ca: -30deg"></div>
+        <div class="circle" style="--ca: 10deg"></div>
+        <div class="circle" style="--ca: 50deg"></div>
+        <div class="circle" style="--ca: 90deg"></div>
+        <div class="circle" style="--ca: 130deg"></div>
+        <div class="circle" style="--ca: 170deg"></div>
+        <div class="circle" style="--ca: 210deg"></div>
+        <div class="circle" style="--ca: 250deg"></div>
+    </div> -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-6 col-lg-5 mb-60">
+                <form id="login_form" action="{{ request.get_full_path }}" method="post"  >
+                    <div class="register-title mb-20">
+                        <h2 class="tlt">{% trans 'Log In' %}</h2>
+                    </div>
+                    {% csrf_token %}
+                    {% include "oscar/partials/form_fields.html" with form=login_form %}
+                    <p style="font-size: 14px"><strong><a href="{% url 'password-reset' %}">{% trans "I've forgotten my password" %}</a></strong></p>
+                    <button name="login_submit" type="submit" value="Log In" class="btn btn--primary btn--rounded" data-loading-text="{% trans "Logging in..." %}">{% trans 'Log In' %}</button>
+                </form>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-5 offset-lg-1 mt-5 mt-md-0">
+                <form id="register_form" action="{{ request.get_full_path }}" method="post" class="">
+                    <div class="register-title mb-20">
+                        <h2 class="tlt">{% trans 'Register' %}</h2>
+                    </div>
+                    {% csrf_token %}
+                    {% include "oscar/partials/form_fields.html" with form=registration_form %}
+                    <button name="registration_submit" type="submit" value="Register" class="btn btn--primary btn--rounded" data-loading-text="{% trans 'Registering...' %}">{% trans 'Register' %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</section>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    
+    // per stilizzare i radio button
+    $('#group_id_registration-newsletter').prepend('<small>{% blocktrans %}Il sottoscritto Interessato, letta l’informativa al <a href="/newsletter-policy/" class="text-bold">seguente link</a> ed acquisite le informazioni fornite dal Titolare del trattamento:{% endblocktrans %}</small>');
+    $('#group_id_registration-newsletter').append('<small>{% blocktrans %}ad essere aggiornato su tutte le iniziative promozionali e commerciali, attraverso l’invio di materiale pubblicitario e/o promozionale tramite e-mail{% endblocktrans %}.</small>')
+    var fc1 = $('#id_registration-newsletter').closest('.form-check');
+    fc1.addClass('custom-control custom-radio form-check-1');
+    $('#id_registration-newsletter input').addClass('custom-control-input');
+    $('label[for="id_registration-newsletter_0"]').addClass('custom-control-label');
+    $('label[for="id_registration-newsletter_1"]').addClass('custom-control-label');
+    $('#id_registration-newsletter_0').detach().prependTo('.form-check-1 li:first-child()');
+    $('#id_registration-newsletter_1').detach().prependTo('.form-check-1 li:nth-child(2)');
+    
+    // per rendere carine le checkbox
+    var fc2 = $('#id_registration-privacy').closest('.form-check');
+    fc2.addClass('custom-control custom-checkbox form-check-2');
+    $('#id_registration-privacy').addClass('custom-control-input');
+    $('label[for="id_registration-privacy"]').addClass('custom-control-label');
+    $('#id_registration-privacy').detach().prependTo('.form-check-2');
+</script>
+{% endblock %}

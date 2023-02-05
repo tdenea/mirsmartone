@@ -1,0 +1,28 @@
+{% extends "oscar/customer/baseaccountpage.html" %}
+
+
+{% load i18n %}
+
+{% block extra_breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'customer:address-list' %}">{% trans 'Address book' %}</a>
+    </li>
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block tabcontent %}
+<div class="contact-3 new_address_profile">
+    {% include "oscar/partials/form.html" %}
+</div>
+
+{% endblock tabcontent %}
+
+
+{% block extrascripts %}
+<script>
+    $('#group_id_line2').hide();
+    $('#group_id_line3').hide();
+
+</script>
+{% endblock %}

@@ -1,0 +1,253 @@
+{% extends "oscar/checkout/layout.html" %}
+{% load currency_filters poll_extras l10n %}
+{% load i18n %}
+{% load image_tags %}
+
+{% block title %}
+    {% blocktrans with number=order.number %}
+        Order {{ number }}: confirmation
+    {% endblocktrans %} | {{ block.super }}
+{% endblock title %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=5 %}
+{% endblock %}
+
+{% block checkout_title %}
+{% endblock %}
+
+{% block content %}
+<div class="card bg-white py-5 px-3 px-sm-5 mb-5">
+    <h1 style="font-size: 28px;" class="mb-15"> {% blocktrans with number=order.number %}
+        Order {{ number }}: confirmation
+    {% endblocktrans %}</h1>
+    <p class="mb-0">
+        {% blocktrans with number=order.number %}
+        Your order has been placed and a confirmation email has been sent - your order number is
+        <strong class="text-black">{{ number }}</strong>.
+        {% endblocktrans %}<br>
+        {% trans "Please make a note of this reference or print this page and quote it in any communication with us regarding your order." %}
+    </p>
+</div>
+
+    <div class="row shipping-payment">
+            {% block shipping_info %}
+            <div class="col-sm-12 col-md-7 col-lg-8">
+                <div class="cart-total-amount cart-product-action card bg-white mb-40  py-5 px-3 px-sm-5">
+                    <h3 class="text-center" style="font-size: 24px;">{% trans "Shipping & Payment" %}</h3>
+                    <div class="">
+                        <h5>{% trans "Shipping Address" %}</h5>
+                        {% if order.shipping_address %}
+                            <address>
+                                {% for field in order.shipping_address.active_address_fields %}
+                                    {{ field }}<br/>
+                                {% endfor %}
+                            </address>
+
+                            {% if order.shipping_address.phone_number %}
+                                <h5>{% trans "Contact" %}</h5>
+                                <p class="mb-0">
+                                    {% trans "Phone" %}: {{ order.shipping_address.phone_number }}
+                                    {% if order.guest_email %}
+                                        <br/>{% trans "Email" %}: {{ order.guest_email }}
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+
+                            {% if order.shipping_address.notes %}
+                                <h5>{% trans "Instructions" %}</h5>
+                                <p class="mb-0">{{ order.shipping_address.notes|linebreaks }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p>{% trans "No shipping address required." %}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if order.billing_address %}
+                            <h5>{% trans "Billing address" %}</h5>
+                            <address class="mb-0">
+                                {% for field in order.billing_address.active_address_fields %}
+                                    {{ field }}<br/>
+                                {% endfor %}
+                            </address>
+                        {% endif %}
+                    </div>
+
+                    <div class="">
+                        <h5>{% trans "Shipping method" %}</h5>
+                        <p class="mb-0">{{ order.shipping_method }}</p>
+                    </div>
+
+                    {% block payment_info %}
+                    <div class="">
+                        <h5>{% trans "Payment" %}</h5>
+                        {% for source in order.sources.all %}
+                            <p class="">
+                            {% if source.reference %}
+                                {% blocktrans with amount=source.amount_allocated|currency:source.currency type=source.source_type.name reference=source.reference %}
+                                    Allocation of {{ amount }} from type {{ type }} (reference: {{ reference }})
+                                {% endblocktrans %}
+                            {% else %}
+                                {% blocktrans with amount=source.amount_allocated|currency:source.currency type=source.source_type.name %}
+                                    Allocation of {{ amount }} from type {{ type }}
+                                {% endblocktrans %}
+                            {% endif %}
+                            </p>
+                        {% empty %}
+                            <p class="">
+                            {% trans "No payment was required for this order." %}
+                            </p>
+                        {% endfor %}
+
+                        
+                    </div>
+                    {% endblock %}
+
+                </div>
+            </div>
+            {% endblock %}
+      
+  
+
+    {% block order_contents %}
+    <div class="col-md-5 col-lg-4">
+            <div class="cart-coupon">
+                <div class="cart-total-amount cart-product-action card bg-white py-5 px-3 px-sm-5">
+                    <h5 class="text-center pb-4">{% trans "Order contents" %}</h5>
+                {% for line in order.lines.all %}
+                    <div class="basket-items cart--products">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="image_container w-100">
+                                    {% with image=line.product.primary_image %}
+                                        {% oscar_thumbnail image.original "200x200" upscale=False as thumb %}
+                                        <a href="{{ line.product.get_absolute_url }}">
+                                            <img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
+                                        </a>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <p class="product-title mb-0"><strong><a href="{{ line.product.get_absolute_url }}">{% if LANGUAGE_CODE == 'it' %}{{ line.product.title }}{% else %}{{ line.product.title_en }}{% endif %}</a></strong></p>
+                                <!--{% if line.upc %}<p class="mb-0">{{ line.upc }}</p>{% endif %}-->
+                                <p class="mb-10">{% trans "Quantity" %}: {{ line.quantity }}</p>
+                                <p class="text-bold">
+                                    {% if show_tax_separately %}
+                                        {{ line.line_price_before_discounts_excl_tax|currency:order.currency }}
+                                    {% else %}
+                                        {{ line.line_price_before_discounts_incl_tax|currency:order.currency }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% block basket_totals %}
+                    <div class="checkout--panel px-0 pb-0"> 
+                        {% include 'oscar/order/partials/basket_totals.html' %}
+                    </div>
+                {% endblock basket_totals %}
+                </div>
+            </div>
+            
+
+
+        {% block order_tracking %}
+        {% if not order.user %}
+        <div class="cart-total-amount cart-product-action mt-40">
+            <h3 class="text-center" style="font-size: 28px;">{% trans "Tracking your order" %}</h3>
+            <div class="basket-items cart--products">
+                <p class="mb-10">{% trans "You can track the status of your order" %}</p>
+                <a class="btn btn--primary" href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{% trans "View order status" %}</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endblock %}
+
+        {% block order_actions %}
+        
+        <!-- <div class="">
+            <p><a onclick="window.print()" href="#" class="btn btn-primary btn-block btn-lg">{% trans "Print this page" %}</a></p>
+        </div> -->
+        <div class="mt-40">
+            <a href="{{ homepage_url }}" class="btn btn--primary btn-block btn-lg w-100">{% trans "Continue shopping" %}</a>
+        </div>
+            
+        {% endblock order_actions %}
+    </div>
+    {% endblock order_contents %}
+</div>
+{% endblock content %}
+
+{% block extratracking %}
+    {{ block.super }}
+    {% if send_analytics_event %}
+    {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+    if(typeof(fbq) !== 'undefined'){
+        fbq('track', 'Purchase',
+        {
+            value: {{ order.total_incl_tax|escapejs }},
+            currency: '{{ order.currency|escapejs }}',
+            content_ids: [{% for line in order.lines.all %}'{{ line.product.upc }}'{% if not forloop.last and order.lines.all.count > 1 %},{% endif %}{% endfor %}],
+            contents: [
+            {% for line in order.lines.all %}
+            {
+                id: '{{ line.product.upc }}',
+                quantity: {{ line.quantity }}
+            }{% if not forloop.last and order.lines.all.count > 1 %},{% endif %}
+            {% endfor %}
+            ],
+            content_type: 'product'
+        }
+        );
+    }
+    {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block extratracking_gtag %}
+    {{ block.super }}
+    {% if send_analytics_event %}
+    if(typeof(gtag) !== 'undefined'){
+        gtag('event', 'set_checkout_option', {
+            'event_label': "Order Confirmation",
+            "checkout_step": 4,
+            "checkout_option": "Order Confirmation"
+        });
+        
+        gtag('event', 'purchase', {
+            "transaction_id": '{{ order.number|escapejs }}',
+            "affiliation": '{{ shop_name|escapejs }}',
+            "value": '{{ order.total_incl_tax|unlocalize|escapejs }}',
+            "currency": '{{ order.currency|escapejs }}',
+            "tax": '{{ order.total_tax|unlocalize|escapejs }}',
+            "shipping": '{{ order.shipping_incl_tax|unlocalize|escapejs }}',
+            items: [
+                {% for line in order.lines.all %}
+                {
+                    "item_id": '{{ line.partner_sku|escapejs }}',
+                    "item_name": '{{ line.title|escapejs }}',
+                    "affiliation": '{{ shop_name|escapejs }}',
+                    "index": {{ forloop.counter }},
+                    {% spaceless %}{% for c in line.category.all %}
+                    "item_category{% if not forloop.first %}{{ forloop.counter }}{% endif %}": "{{c.name|striptags|remove_newlines}}",{% endfor %}{% endspaceless %}
+                    "google_business_vertical": "retail",
+                    "currency": "{{ order.currency|escapejs }}",
+                    'quantity': '{{ line.quantity|escapejs }}',
+                    "item_brand": "MIR",
+                    'price': '{{ line.unit_price_incl_tax|unlocalize|escapejs }}'
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        });
+
+        {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+        gtag('event', 'conversion', {
+            'send_to': 'AW-10940014376/ctKLCOLrrcoDEKi-zeAo',
+            'transaction_id': ''
+        });
+        {% endif %}
+    }
+    {% endif %}
+{% endblock %}

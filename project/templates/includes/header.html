@@ -1,0 +1,64 @@
+{% load static i18n %}
+
+<header id="navbar-spy" class="header header-1 header-smartone">
+    <nav id="primary-menu" class="navbar navbar-expand-lg navbar-light h-100">
+        <div class="container-large d-flex justify-content-between align-items-center">
+            <a class="navbar-brand position-relative mr-30" href="/{{ LANGUAGE_CODE }}/">
+                <img class="logo" src="{% static 'img/logo-smartone.svg' %}" alt="logo">
+                <span class="sr-only">Home Smart One</span>
+            </a>
+            <div class="d-flex justify-content-end justify-content-lg-start">
+                <div class="module-container d-flex h-100 align-items-center">
+                    <div class="module module-lang module-dropdown module-dropdown-right pull-left d-none d-sm-block">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        <div class="module-icon">
+                            <button type="button" class="dropdown-toggle text-uppercase" data-toggle="dropdown">
+                                {{ LANGUAGE_CODE }} <i class="fa fa-caret-down"></i>
+                            </button>
+                        </div>
+                        <div class="module-dropdown-menu module-content">
+                            {% include "includes/languages.html" %}
+                        </div>
+                    </div>
+
+                    <!-- User -->
+                    <div class="module module-dropdown module-currency module-dropdown-right pull-left">
+                        <a class="module-icon d-block position-relative" href="{% if user.is_authenticated %}{% url 'customer:summary' %}{% else %}{% url 'customer:login' %}{% endif %}" class="d-flex align-items-center nav-ii-link nav-icon" title="{% if user.is_authenticated %}{% trans 'Account' %}{% else %}{% trans 'Login or register' %}{% endif %}">
+                            {% if user.is_authenticated %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f424f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f424f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <!-- Module Cart -->
+                    <div class="module module-cart pull-left d-none d-lg-block">
+                        <div class="module-icon cart-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f424f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                            <label class="module-label" style="{% if request.basket.is_empty %}display: none;{% endif %}">{{request.basket.num_items}}</label>
+                        </div>
+                        <div class="module-content module-box cart-box">
+                            {% include "basket/partials/basket_quick.html" %}
+                        </div>
+                    </div>
+                    <div class="module module-cart pull-left d-lg-none">
+                        <a class="" href="{% url 'basket:summary' %}">
+                            <div class="module-icon cart-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f424f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                                <label class="module-label" style="{% if request.basket.is_empty %}display: none;{% endif %}">{{request.basket.num_items}}</label>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="module-menu-container me-3">
+                        <button class="hamburger hamburger--spin" type="button" data-toggle="modal" data-target="#menu-popup">
+                            <span class="hamburger-box">
+                              <span class="hamburger-inner"></span>
+                            </span>
+                          </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,12 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load i18n %}
+{% block body %}
+<p>{% trans "Hi" %},</p>
+<p>{% trans "We have received your message and will get back to you as soon as possible." %}</p>
+<p>{% trans "Below, the message you sent us:" %}</p>
+<br>
+<strong>{% trans "Message" %}:</strong><br>
+{{ obj.message }}
+<br><br>
+<strong>{% trans "Sent" %}</strong> {{ obj.date_received }}
+{% endblock %}

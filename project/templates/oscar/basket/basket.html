@@ -1,0 +1,105 @@
+{% extends "oscar/layout.html" %}
+{% load i18n %}
+{% load purchase_info_tags poll_extras %}
+
+{% block title %}
+    {% trans "Basket" %} | {{ block.super }}
+{% endblock %}
+
+{% block nav_accounts %}{% endblock %}
+{% block header_wrapper %}{% endblock %}
+{% block header %}{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans "Basket" %}</li>
+        </ol>
+    </nav> -->
+    <section id="page-title" class="mt-100 bg-lightBlue pt-5" style="overflow: hidden;">
+        <div class="watch-face watch-face-topleft position-absolute" style="margin-bottom: 150px;">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+          </div>
+        <div class="container pt-5 mb-80 mb-md-0">
+            <ol class="breadcrumb mb-3">
+                <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+                <li class="active">{% trans "Basket" %}</li>
+            </ol>
+            <h1 class="tlt">{% trans "Basket" %}</h1>
+            <!-- <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="pt-60 text-center">
+                        <div class="title--content">
+                            <div class="title--heading">
+                                <h1>{% trans "Basket" %}</h1>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <ol class="breadcrumb">
+                            <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+                            <li class="active">{% trans "Basket" %}</li>
+                        </ol>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </section>
+{% endblock %}
+
+{# Hide mini-basket so we don't have two baskets to keep in sync #}
+{% block mini_basket %}{% endblock %}
+
+{% block headertext %}
+    <!-- {% trans "Basket" %} -->
+{% endblock %}
+
+{% block content %}
+    {# Use a partial template so that AJAX can be used to re-render basket #}
+    {% include 'oscar/basket/partials/basket_content.html' %}
+{% endblock content %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    {# We pass in the URL to send AJAX requests to #}
+    var options = {
+        'basketURL': '{% url 'basket:summary' %}'
+    };
+    oscar.basket.init(options);
+{% endblock %}
+
+{% block extratracking_gtag %}
+    {{ block.super }}
+    {% if request.basket.all_lines %}
+    if(typeof(gtag) !== 'undefined'){
+        gtag('event', 'view_cart', {
+            "items": [
+                {% for line in request.basket.all_lines %}
+                {% purchase_info_for_product request line.product as session %}
+                {
+                    "item_id": "{% if line.product.parent %}{{ line.product.parent.upc }}{% else %}{{ line.product.upc }}{% endif %}",
+                    "item_name": "{{ line.product.get_title }}",
+                    "affiliation": '{{ shop_name|escapejs }}',
+                    "index": {{ forloop.counter }},
+                    {% spaceless %}{% for c in line.product.categories.all %}
+                    "item_category{% if not forloop.first %}{{ forloop.counter }}{% endif %}": "{{c.name|striptags|remove_newlines}}",{% endfor %}{% endspaceless %}
+                    "google_business_vertical": "retail",
+                    "currency": "{{ session.price.currency|escapejs }}",
+                    "item_brand": "MIR",
+                    'quantity': '{{ line.quantity|escapejs }}',
+                    "price": '{{ session.price.incl_tax|replace_commas }}'
+                }{% if not forloop.last and request.basket.all_lines|length > 1 %},{% endif %}
+                {% endfor %}
+            ]
+        });
+    }
+    {% endif %}
+{% endblock %}

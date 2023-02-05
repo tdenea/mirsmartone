@@ -1,0 +1,79 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load currency_filters i18n thumbnail %}
+
+{% block tbody %}
+<tr>
+    <td class="content-block">
+      <p>{% blocktrans with order_number=obj.number %}New order {{ order_number }}{% endblocktrans %}</p>
+    </td>
+</tr>
+
+<tr>
+    <td class="content-block">
+        <table class="order" width="100%" cellpadding="0" cellspacing="0">
+            <tbody><tr>
+                <td><b>{% trans 'Your order contains:' %}</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <table class="order-items" width="100%" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            {% for line in obj.lines.all %}
+                                <tr>
+                                    <td width="64">
+                                      {% with image=line.product.primary_image %}
+                                      {% thumbnail image.original "128x128" crop='top' as thumb %}
+                                      <a style="display: block;" href="https://{{ site.domain }}{{ line.product.get_absolute_url }}">
+                                        <img src="https://{{ site.domain }}{{ thumb.url }}" alt="{{ line.product.get_title }}">
+                                      </a>
+                                      {% endthumbnail %}
+                                      {% endwith %}
+                                    </td>
+                                    <td>
+                                      {{ line.title }} &times; {{ line.quantity }}<br>
+                                      {% for attr in line.product.get_details_list %}
+                                      <p>
+                                          <span style="font-size: 14px;">{{attr.0}}:</span>
+                                          <span style="font-size: 14px;">{{attr.1}}</span>
+                                      </p>
+                                      {% endfor %}
+                                    </td>
+                                    <td class="alignright">{{ line.line_price_incl_tax|currency:obj.currency }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="2" class="alignright">{% trans 'Basket total:' %}</td>
+                                <td class="alignright">{{ obj.basket_total_incl_tax|currency:obj.currency }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="alignright">{% trans 'Shipping:' %}</td>
+                                <td class="alignright">{{ obj.shipping_incl_tax|currency:obj.currency }}</td>
+                            </tr>
+                            <tr class="total">
+                                <td colspan="2" class="alignright" width="80%"><b>{% trans 'Order Total:' %}</b></td>
+                                <td class="alignright"><b>{{ obj.total_incl_tax|currency:obj.currency }}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody></table>
+    </td>
+</tr>
+
+<tr>
+    <td class="content-block">
+        <p><b>{% trans 'Shipping address:' %}</b></p>
+        <p>{% for field in obj.shipping_address.active_address_fields %}  {{ field }}<br/>
+        {% endfor %}</p>
+    </td>
+</tr>
+
+{% if status_url %}
+    <tr>
+        <td class="content-block">
+            {% blocktrans %}You can view the status of this order by clicking <a href="{{ status_url }}" title="order status" style="color: #ff8354">here</a>{% endblocktrans %}
+        </td>
+    </tr>
+{% endif %}
+{% endblock %}

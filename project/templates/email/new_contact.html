@@ -1,0 +1,16 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load i18n %}
+{% block body %}
+<h3>{% trans "New request from website" %}</h3>
+<br>
+<strong>{% trans "Name and Surname" %}:</strong> {{ obj.name }}<br>
+<strong>{% trans "E-mail" %}:</strong> {{ obj.email }}<br>
+{% if obj.phone %}<strong>{% trans "Phone" %}:</strong> {{ obj.phone }}<br>{% endif %}
+<strong>{% trans "Message" %}:</strong><br>
+{{ obj.message }}
+<br><br>
+{% if obj.privacy %}{% trans "The person has given consent to the processing of personal data" %}<br>{% endif %}
+{% if obj.newsletter %}{% trans "The person has given consent to the subscription to the newsletter" %}{% else %}{% trans "The person has <strong>NOT</strong> given consent to the subscription to the newsletter" %}<br>{% endif %}
+<br><br>
+<strong>{% trans "Sent" %}</strong> {{ obj.date_received }}
+{% endblock %}

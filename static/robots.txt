@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin/
+
+Sitemap: https://mircardionica.com/sitemap.xml
+
+User-agent: Googlebot
+Disallow:
+
+User-agent: Googlebot-image
+Disallow:

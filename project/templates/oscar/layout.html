@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static poll_extras %}
+
+{% block styles %}
+    <!-- <link rel="stylesheet" type="text/css" href="{% static "oscar/css/styles.css" %}" /> -->
+{% endblock %}
+
+{% block hreflang %}
+<link rel="alternate" hreflang="en" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}/en{{request.path|strip_lang}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+<link rel="alternate" hreflang="it" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}/it{{request.path|strip_lang}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+<link rel="alternate" hreflang="de" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}/de{{request.path|strip_lang}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+<link rel="alternate" hreflang="fr" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}/fr{{request.path|strip_lang}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+<link rel="alternate" hreflang="es" href="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}/es{{request.path|strip_lang}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
+{% endblock %}
+
+{% block layout %}
+    {# Top-horizontal bar with account, notifictions, dashboard links #}
+    {% block nav_accounts %}
+    {% comment %}
+    {% include "oscar/partials/nav_accounts.html" %}
+    {% endcomment %}
+    {% endblock %}
+
+    {# Site logo/title, mini-basket, browse dropdown and searchbox #}
+    {% block header_wrapper %}
+    {% comment %}
+    <header class="header container">
+        <div class="page_inner">
+            <div class="row justify-content-between">
+                {% include "oscar/partials/brand.html" %}
+                {# Mini-basket wrapped in a block so some templates can now display it #}
+                {% block mini_basket %}{% include "oscar/partials/mini_basket.html" %}{% endblock %}
+            </div>
+        </div>
+        {% block navigation %}
+            {% include "oscar/partials/nav_primary.html" %}
+        {% endblock %}
+    </header>
+    {% endcomment %}
+    {% endblock %}
+
+    {# Main content of page - other layout templates may override this block #}
+    {% block content_wrapper %}
+
+                {% block breadcrumbs %}{% endblock %}
+                {% block header %}
+                    <div class="page-header">
+                        <h1>{% block headertext %}{% endblock %}</h1>
+                    </div>
+                {% endblock %}
+                {% include "oscar/partials/alert_messages.html" %}
+                {% block subnavigation %}{% endblock %}
+                <div class="content">
+                    {% block subheader %}{% endblock subheader %}
+
+                    {# Div exists for AJAX updates to entire content section #}
+                    <div id="content_inner">{% block content %}{% endblock %}</div>
+                </div>
+           
+    {% endblock %}
+
+    {% comment %}
+    {% include "oscar/partials/footer.html" %}
+    {% endcomment %}
+{% endblock %}
+
+{# Local scripts #}
+{% block scripts %}
+    {{ block.super }}
+    <!-- Twitter Bootstrap -->
+    <script src="{% static "oscar/js/bootstrap4/bootstrap.bundle.min.js" %}"></script>
+    <!-- Oscar -->
+    <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
+{% endblock %}
+
+{% block extrascripts %}
+    {% include "oscar/partials/extrascripts.html" %}
+    {{ block.super }}
+{% endblock %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    oscar.init();
+{% endblock %}

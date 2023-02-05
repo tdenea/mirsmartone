@@ -1,0 +1,61 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load currency_filters i18n thumbnail %}
+
+{% block tbody %}
+<tr>
+  <td class="content-block">
+      <p xmlns="http://www.w3.org/1999/html">{% if user_data.first_name %}{% trans 'Buongiorno' %} {{user_data.first_name}},{% else %}{% trans 'Buongiorno,' %}{% endif %}</p>
+      <p>{{products|length}} {% if products|length > 1 %}{% trans 'prodotti sono ancora disponibili nel tuo carrello' %}{% else %}{% trans 'prodotto è ancora disponibile nel tuo carrello' %}{% endif %}, {% trans 'se non hai cambiato idea completa l’ordine' %}.</p>
+      <p>{% trans "Se hai bisogno di maggiori informazioni, contatta il nostro" %} <a href="https://{{ site }}/customer-service/" target="_blank"><strong>{% trans 'servizio clienti' %}</strong></a>.</p>
+      {% comment %}
+      <p>{% blocktrans %}Se ti senti un po’ indecis*, lasciati convincere con questo codice sconto del <strong>15%</strong> solo per te:{% endblocktrans %}</p>
+      <p style="text-align: center; padding-top: 10px;">
+        <strong style="color: #ff8354; padding: 8px; font-size: 18px; border: 2px dashed #ff8354;">DONTMISSACART</strong>
+      </p>
+      {% endcomment %}
+      <p><a href="https://{{ site }}/" target="_blank"><strong>{% trans 'Torna sul sito' %}</strong></a>.</p>
+  </td>
+</tr>
+
+<tr>
+  <td class="content-block">
+    <table class="order" width="100%" cellpadding="0" cellspacing="0">
+      <tbody>
+        <tr>
+          <td><b>{% trans 'Il tuo carrello contiene:' %}</b></td>
+        </tr>
+        <tr>
+          <td>
+            <table class="order-items" width="100%" cellpadding="0" cellspacing="0">
+              <tbody>
+                {% for product in products %}
+                <tr>
+                  <td width="64">
+                    <a style="display: block;" href="https://{{ site }}{{product.get_absolute_url}}">
+                      <img src="https://{{ site }}{{ product.img }}" alt="{{ product.name }}">
+                    </a>
+                  </td>
+                  <td colspan="2" style="padding: 10px;">
+                    <a href="https://{{ site }}{{product.get_absolute_url}}">{{ product.name }}</a> &times; {{ product.quantity }}<br>
+                  </td>
+                  <td class="alignright">{{ product.total_price|currency:product.currency }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <td class="content-block" valign="middle" align="center" style="padding-top: 20px;">
+    <p style="text-align: center;"><a href="https://{{site}}/shop/basket/" target="_blank" class="btn-primary">{% trans 'Vai al tuo carrello' %}</a></p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

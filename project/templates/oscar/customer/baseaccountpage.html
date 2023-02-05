@@ -1,0 +1,64 @@
+{% extends "oscar/layout_2_col.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {{ page_title }} | {% trans 'Account' %} | {{ block.super }}
+{% endblock %}
+
+
+{% block body_class %}account-profile{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ homepage_url }}">{% trans 'Home' %}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'customer:summary' %}">{% trans 'Account' %}</a>
+            </li>
+            {% block extra_breadcrumbs %}{% endblock %}
+            <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+        </ol>
+    </nav> -->
+
+    <section id="page-title" class="mt-100 bg-lightBlue pt-5 overflow-hidden" style="z-index: -1;">
+        <div class="watch-face watch-face-topleft position-absolute" style="margin-bottom: 150px;">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+        </div>
+        <div class="container pt-5">
+            <ol class="breadcrumb mb-3">
+                <li><a href="{{ homepage_url }}">{% trans 'Home' %}</a></li>
+                <li><a href="{% url 'customer:summary' %}">{% trans 'Account' %}</a></li>
+                <li class="active">{{ page_title }}</li>
+            </ol>
+            <h1 class="tlt">{{ page_title }}</h1>
+        </div>
+    </section>
+{% endblock %}
+
+{% block headertext %}{% endblock %}
+
+{% block column_left %}
+<div class="cart-total-amount px-4">
+ <ul class="nav nav-pills flex-column">
+        {% block standard_tabs %}
+            {% include 'oscar/customer/partials/standard_tabs.html' %}
+        {% endblock %}
+    </ul>
+</div>
+   
+{% endblock %}
+
+{% block content %}
+    {% block tabcontent %}{% endblock tabcontent %}
+{% endblock content %}

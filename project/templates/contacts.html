@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block layout %}
+<section id="about-gallery" class="contact contact-3 pt-100 pb-0 position-relative">
+    <div class="container-fluid container-padding position-relative z-2">
+        <div class="row align-items-stretch">
+            <div class="col-sm-12 col-lg-5 px-0 order-2 order-lg-1 d-flex justify-content-center" style="background-image: url(/static/img/smartoneoxi-mani-donna2.jpg); background-size: auto; background-position: center center; background-repeat: no-repeat;">
+                <img src="{% static 'img/smartoneoxi-mani-donna2.jpg' %}" class="img-fluid d-lg-none" alt="img" >
+            </div>
+            <!-- .col-lg-6 end -->
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xxl-5 mx-auto mt-60 mb-100 order-1 order-lg-2">
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-5 mb-md-0">
+                        <div class="wow fadeIn">
+                            <div class="panel--content px-0">
+                                <h5>{% trans 'MIR Italy' %}
+                                </h5>
+                                <p class="mb-3">{% trans 'Via del Maggiolino, 125 00155 Roma - Italy' %}
+                                </p>
+                                <ul class="list-unstyled mb-0">
+                                    <li>{% trans 'Email' %}: <a href="mailto:mir@spirometry.com">mir@spirometry.com</a></li>
+                                    <li>{% trans 'Phone' %}: <a href="tel:+390622754785">+39 06 22754785</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mt-4 mt-md-0">
+                        <div class="wow fadeIn" data-wow-delay=".2s">
+                            <div class="panel--content px-0">
+                                <h5>{% trans 'MIR France' %}
+                                </h5>
+                                <p class="mb-3">{% trans 'Jardin des Entreprises, 290 Chemin de Saint Dionisy 30980 Langlade - France' %}
+                                </p>
+                                <ul class="list-unstyled mb-0">
+                                    <li>{% trans 'Email' %}: <a href="mailto:mirfrance@spirometry.com">mirfrance@spirometry.com</a></li>
+                                    <li>{% trans 'Phone' %}: <a href="tel:+33466372068">+39 06 22754785</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="py-5 mt-lg-5">
+                    <h2 class="text-center text-md-left mt-5 mt-md-0 tlt">{% trans 'Get In Touch With Us' %}</h2>
+                    <form method="post" action="/send_contact/" class="contactForm mb-0" id="formContact">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="{% trans 'Name and surname' %}" required>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-12 col-sm-6">
+                                <input type="email" class="form-control" name="email" id="email" placeholder="{% trans 'Email' %}" required>
+                            </div>
+                            <div class="form-group col-12 col-sm-6">
+                                <input type="tel" class="form-control" name="phone" id="phone" placeholder="{% trans 'Phone' %}" required>
+                            </div>
+                        </div>
+                        <div class="form-group mb-30">
+                            <textarea class="form-control pt-10" name="message" id="message" rows="2" placeholder="{% trans 'Your message here' %}" required></textarea>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-20">
+                            <input type="checkbox" class="custom-control-input" name="privacy" id="privacy" required>
+                            <label class="custom-control-label pt-1" for="privacy">{% blocktrans %}I have read the privacy policy <a href="/{{LANGUAGE_CODE}}/contacts-policy/" target="_blank">at this link</a>{% endblocktrans %}</label>
+                        </div>
+                        <div>
+                            <small>{% blocktrans %}Il sottoscritto Interessato, letta l’informativa al <a href="/newsletter-policy/" class="text-bold">seguente link</a> ed acquisite le informazioni fornite dal Titolare del trattamento:{% endblocktrans %}</small>
+                            <div class="d-flex align-items-center">
+                                <div class="custom-control custom-radio mr-5 py-2">
+                                    <input class="custom-control-input" type="radio" name="newsletter" id="newsletterContact1" value="true">
+                                    <label class="custom-control-label" for="newsletterContact1" required>
+                                        {% trans "presta il consenso" %}
+                                    </label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                    <input class="custom-control-input" type="radio" name="newsletter" id="newsletterContact2" value="false">
+                                    <label class="custom-control-label" for="newsletterContact2">
+                                        {% trans "nega il consenso" %}
+                                    </label>
+                                </div>
+                            </div>
+                            <small>{% blocktrans %}ad essere aggiornato su tutte le iniziative promozionali e commerciali, attraverso l’invio di materiale pubblicitario e/o promozionale tramite e-mail{% endblocktrans %}.</small>
+                        </div>
+                        <div id='recaptcha1'></div>
+                        <button type="submit" class="btn btn--primary btn--rounded px-5 w-auto mt-30" id="submitBtn">{% trans 'SEND Message' %}</button>
+                    </form>
+                </div>
+               
+            </div>
+        </div>
+    </div> 
+    <div class="bg-lightBlue position-relative mb-0 py-5 py-lg-0 py-lg-130" style="overflow: hidden; margin-top: -80px;">
+        <div class="watch-face watch-face-bottomright position-absolute" >
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+        </div>
+        <div class="container-large mt-5">
+            <div class="row">
+                <div class="col-md-12 pb-40-sm pt-80 pt-lg-40">
+                    <div class="contact-3" data-aos="fade">
+                        <div class="heading">
+                            <h2 class="heading--title">{% blocktrans %}Subscribe to our newsletter{% endblocktrans %}</h2>
+                        </div>
+                        <form method="post" action="/send_newsletter/" class="formNewsletter mb-0 d-flex flex-wrap flex-sm-nowrap align-items-start" id="formNewsletter">
+                            {% csrf_token %}
+                            <div class="mr-3">
+                                <div class="form-group">
+                                    <input type="email" class="form-control" name="email_nl" id="email_nl" placeholder="{% trans 'Email' %}" required>
+                                </div>
+                                <div>
+                                    <small class="">{% blocktrans %}Il sottoscritto Interessato, letta l’informativa al <a href="/newsletter-policy/" class="text-black text-hover-white text-bold">seguente link</a> ed acquisite le informazioni fornite dal Titolare del trattamento:{% endblocktrans %}</small>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div class="custom-control custom-radio mr-5 py-2">
+                                            <input class="custom-control-input" type="radio" name="newsletter_nl" id="newsletter_nl1" value="true" required>
+                                            <label class="custom-control-label" for="newsletter_nl1">
+                                                {% trans "presta il consenso" %}
+                                            </label>
+                                            </div>
+                                            <div class="custom-control custom-radio">
+                                            <input class="custom-control-input" type="radio" name="newsletter_nl" id="newsletter_nl2" value="false">
+                                            <label class="custom-control-label" for="newsletter_nl2">
+                                                {% trans "nega il consenso" %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <small class="">{% blocktrans %}ad essere aggiornato su tutte le iniziative promozionali e commerciali, attraverso l’invio di materiale pubblicitario e/o promozionale tramite e-mail{% endblocktrans %}.</small>
+                                </div>
+                                <div id='recaptcha2'></div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn--secondary btn--rounded px-5 w-auto btn-hover-white mt-4 mt-sm-0 ml-1 ml-0" id="submitBtnNewsletter" disabled>{% trans 'Subscribe' %}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+<!-- <div id='recaptcha' class="g-recaptcha" data-sitekey="6Ld-MgAiAAAAAFll4DjMvw4AV4RvFmx2xy1HIw_U" data-callback="onSubmit" data-size="invisible"></div> -->
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+
+    //controlla bottone newsletter
+    function checkBtnNewsletter(){
+        if ($('#formNewsletter input[name="newsletter_nl"]:checked').val() == 'true') {
+            $('#submitBtnNewsletter').removeAttr('disabled');
+        }
+        else {
+            $('#submitBtnNewsletter').attr('disabled', 'disabled');
+        }
+    }
+    $("input[name=newsletter_nl]:radio").change(function () {
+        checkBtnNewsletter();
+    });
+    checkBtnNewsletter();
+
+
+    //gestione form
+    var grec1Call = 0;
+    var grec2Call = 0;
+
+    // submit form contatti
+    $(document).on('submit', '#formContact', function(e){
+      e.preventDefault();
+      if (!$('#name').val() || !$('#email').val() || !$('#phone').val() || !$('#message').val() || !$('input[name="newsletter"]').is(':checked') || !$('#privacy').is(':checked')) {
+        alert("{% trans 'Compila tutti i campi!' %}");
+      } else {
+        //grecaptcha.execute();
+        grec1Call++;
+
+        e.preventDefault();
+        console.log("validation success");
+
+        if(grec1Call==1){
+            widgetId1 = grecaptcha.render('recaptcha1', {
+            'sitekey' : '6Ld-MgAiAAAAAFll4DjMvw4AV4RvFmx2xy1HIw_U',
+            'callback' : onSubmitContact,
+            'size' : "invisible"
+            });
+            console.log("imposto recaptcha");
+        }
+
+        grecaptcha.reset(widgetId1);
+        grecaptcha.execute(widgetId1);  
+      }
+    });
+
+    // submit form newsletter
+    $(document).on('submit', '#formNewsletter', function(e){
+        e.preventDefault();
+        if ( !$('#email_nl').val() || !$('input[name="newsletter_nl"]').is(':checked')) {
+            alert("Compila tutti i campi!");
+        } else {
+            //grecaptcha.execute();
+            grec2Call++;
+
+            e.preventDefault();
+            console.log("validation success");
+
+            if(grec2Call==1){
+                widgetId2 = grecaptcha.render('recaptcha2', {
+                'sitekey' : '6Ld-MgAiAAAAAFll4DjMvw4AV4RvFmx2xy1HIw_U',
+                'callback' : onSubmitNewsletter,
+                'size' : "invisible"
+                });
+                console.log('oooops')
+            }
+
+            grecaptcha.reset(widgetId2);
+            grecaptcha.execute(widgetId2);  
+        }
+    });
+
+    // funzione submit contatti
+    function onSubmitContact(token){
+        $('#formContact > #submitBtn').prop("disabled", true);
+        $.ajax({
+              type:'POST',
+              url:'/send_contact/',
+              data: {
+                recaptcha_response: token,
+                name: $('#formContact #name').val(),
+                phone: $('#formContact #phone').val(),
+                email: $('#formContact #email').val(),
+                message: $('#formContact #message').val(),
+                privacy: $('#formContact #privacy').is(':checked'),
+                newsletter: $('#formContact input[name="newsletter"]:checked').val(),
+                csrfmiddlewaretoken: $('#formContact input[name=csrfmiddlewaretoken]').val()
+              },
+          })
+          .done(function(response) {
+            grecaptcha.reset();
+              if(response.error == 1){
+                $('#modalFormError').modal('show');
+              }else if(response.error == 2){
+                  alert( response.msg );
+              }else{
+                {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+                // Event facebook pixel
+                if(typeof fbq !== 'undefined'){
+                    fbq('track', 'Contact');
+                }
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'conversion', {'send_to': 'AW-10940014376/zFBgCOjrrcoDEKi-zeAo'});
+                }
+                {% endif %}
+                if(cc.allowedCategory('analytics_cookies')){
+                    contactEventAnalytics(); // send event analytics
+                }
+                $('#modalFormContactOK').modal('show');
+                $('#formContact').trigger("reset");
+              }
+              $('#formContact > #submitBtn').prop("disabled", false);
+          })
+          .fail(function( jqXHR, textStatus ) {
+              $('#formContact > #submitBtn').prop("disabled", false);
+              $('#modalFormError').modal('show');
+              grecaptcha.reset();
+          });
+    }
+
+
+    // funzione submit newsletter
+    function onSubmitNewsletter(token){
+        $('#formNewsletter > #submitBtnNewsletter').prop("disabled", true);
+        $.ajax({
+              type:'POST',
+              url:'/send_newsletter/',
+              data: {
+                recaptcha_response: token,
+                email: $('#formNewsletter #email_nl').val(),
+                privacy: $('#formNewsletter input[name="newsletter_nl"]:checked').val(),
+                csrfmiddlewaretoken: $('#formNewsletter input[name=csrfmiddlewaretoken]').val()
+              },
+          })
+          .done(function(response) {
+            grecaptcha.reset();
+              if(response.error == 1){
+                $('#modalFormError').modal('show');
+              }else if(response.error == 2){
+                  alert( response.msg );
+              }else{
+                {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+                // Event facebook pixel
+                if(typeof fbq !== 'undefined'){
+                    fbq('track', 'Newsletter');
+                }
+                if(typeof(gtag) !== 'undefined'){
+                    gtag('event', 'conversion', {'send_to': 'AW-10940014376/ifQbCJu_xc0DEKi-zeAo'});
+                }
+                {% endif %}
+                if(cc.allowedCategory('analytics_cookies')){
+                    contactNewsletterEventAnalytics(); // send event analytics
+                }
+                $('#modalFormNewsletterOK').modal('show');
+                $('#formNewsletter').trigger("reset");
+              }
+              $('#formNewsletter > #submitBtnNewsletter').prop("disabled", false);
+          })
+          .fail(function( jqXHR, textStatus ) {
+              $('#formNewsletter > #submitBtnNewsletter').prop("disabled", false);
+              $('#modalFormError').modal('show');
+              grecaptcha.reset();
+          });
+    }
+
+    $(window).scroll(function() {
+        $(".heading--title").each(function(){
+            var top_of_element = $(this).offset().top;
+            var bottom_of_element = $(this).offset().top + $(this).outerHeight();
+            var bottom_of_screen = $(window).scrollTop() + window.innerHeight;
+            var top_of_screen = $(window).scrollTop();
+
+            if((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element)){
+                $(this).addClass('tlt');
+                $(this).textillate({ in: { effect: 'fadeIn', delay: 20 } });
+            }
+        });
+    });
+</script>
+{% endblock %}

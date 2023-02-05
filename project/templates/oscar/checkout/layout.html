@@ -1,0 +1,86 @@
+{% extends "oscar/layout.html" %}
+{% load i18n static %}
+{% load category_tags %}
+
+{% block styles %}
+<!-- <link rel="stylesheet" type="text/css" href="{% static "oscar/css/fa.css" %}" /> -->
+{% endblock %}
+
+{% block layout %}
+
+    {% comment %}
+    <!--<header class="header container">
+        <div class="page_inner">
+            <div class="row">
+                {% include "oscar/partials/brand.html" %}
+            </div>
+        </div>
+        {% block checkout_nav %}{% endblock %}
+    </header> -->
+    {% endcomment %}
+    
+    <section id="page-title" class="mt-100 pt-5 pb-0 bg-lightBlue mb-0">
+        <div class="container py-5">
+            <ol class="breadcrumb mb-3">
+                <li><a href="/">Home</a></li>
+                <li class="active">Checkout</li>
+            </ol>
+            <h1 class="tlt mb-0">Checkout</h1>
+        </div>
+        <!-- .container end -->
+    </section>
+
+    <section class="checkout_nav bg-lightBlue pt-3 pb-100" >
+        <div class="container">
+            {% block checkout_nav %}{% endblock %}
+        </div>
+    </section>
+
+    <section id="checkout" class="shop shop-cart checkout pt-0 position-relative" style="margin-top: -110px;z-index: 5; overflow: hidden;">
+        <div class="container page">
+            <div class="page_inner position-relative z-2">
+                {% include 'oscar/partials/alert_messages.html' %}
+
+                <div class="sub-header">
+                    <h1 style="font-size: 28px;" class="mb-15">{% block checkout_title %}{% endblock %}</h1>
+                </div>
+
+                <!-- The main nav on checkout pages contain links to modal flatpages -->
+                {% block modal %}
+                    {% load flatpages %}
+                    {% get_flatpages '/order/' as flatpages %}
+                    {% for page in flatpages %}
+                    <div id="{{ page.title|slugify }}" class="modal hide fade">
+                        <div class="modal-header">
+                            <a class="close" data-dismiss="modal">×</a>
+                            <h3>{{ page.title }}</h3>
+                        </div>
+                        <div class="modal-body">
+                            <div class="large-content">
+                                {{ page.content|safe }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endblock %}
+
+                {% block content %}{% endblock %}
+
+            </div><!-- /page_inner -->
+            <div class="watch-face watch-face-bottomright position-absolute z-1">
+                <div class="circle" style="--ca: -70deg"></div>
+                <div class="circle" style="--ca: -30deg"></div>
+                <div class="circle" style="--ca: 10deg"></div>
+                <div class="circle" style="--ca: 50deg"></div>
+                <div class="circle" style="--ca: 90deg"></div>
+                <div class="circle" style="--ca: 130deg"></div>
+                <div class="circle" style="--ca: 170deg"></div>
+                <div class="circle" style="--ca: 210deg"></div>
+                <div class="circle" style="--ca: 250deg"></div>
+            </div>
+        </div>
+
+        
+    </section>
+    {% include "oscar/partials/footer_checkout.html" %}
+{% endblock %}

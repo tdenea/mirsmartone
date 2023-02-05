@@ -1,0 +1,42 @@
+{% load i18n %}
+{% load image_tags %}
+
+{% with all_images=product.get_all_images %}
+    {# use length rather then count as the images get queried anyways #}
+
+    {% if all_images|length > 0 %}
+
+    <div class="d-none d-lg-block">
+        <div class="row">
+            {% for image in all_images %}
+            <div class="product--img mb-3 {% if image.original.width > image.original.height %}col-12{% else %}col-6{% endif %}" data-aos="fade-up">
+                {% oscar_thumbnail image.original "1200x1200" upscale=False as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="w-100 img-rounded" style="box-shadow: 0px 10px 60px 0px rgba(240, 245, 249, 1);">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="d-lg-none">
+        <div class="owl-carousel products-slider carousel-dots" data-slider-id="1">
+            {% for image in all_images %}
+            <div class="product--img d-flex justify-content-center" style="max-height: 67.5vw;">
+                {% oscar_thumbnail image.original "1200x1200" upscale=False as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="" style="max-height: 67.5vw; width: auto; max-width: 100%;">
+            </div>
+            {% endfor %}
+        </div>
+        <!-- <div class="owl-thumbs thumbs-bg" style="top: 0" data-slider-id="1">
+            {% for image in all_images %}
+            <button class="owl-thumb-item">
+                {% oscar_thumbnail image.original "200x200" upscale=False as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" width="50">
+            </button>
+            {% endfor %}
+           
+        </div> -->
+        <!-- .product-carousel end -->
+    </div>
+
+    {% endif %}
+{% endwith %}

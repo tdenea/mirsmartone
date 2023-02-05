@@ -1,0 +1,62 @@
+{% extends "oscar/customer/baseaccountpage.html" %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+
+{% block tabcontent %}
+
+    {% if addresses %}
+    <div class="row">
+
+    {% for address in addresses %}
+        <div class="col-lg-12">
+            <div class="" style="">
+                {% if address.is_default_for_shipping %}
+                <span class="badge bg-gray py-2 px-3 d-inline-block w-auto text-white">{% trans 'Default shipping address' %}</span>
+            {% endif %}
+            {% if address.is_default_for_billing %}
+                <span class="badge badge-info py-2 px-3 d-inline-block w-auto text-white">{% trans 'Default billing address' %}</span>
+            {% endif %}
+                    <div class="py-4 px-0 position-relative d-flex align-items-start justify-content-sm-between flex-column flex-sm-row" style="border-bottom: 1px solid #e9f0f6; font-size: 16px;">
+                        <address>
+                           
+                            {% for field in address.active_address_fields %}
+                                <span {% if forloop.first %}class="text-bold"{% endif %}>{{ field }}</span>{% if address.active_address_fields|length == 8 %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 3 %}<br/> {% elif forloop.last %}{% else %},{% endif %}{% else %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 2 %}<br/> {% elif forloop.last %}{% else %},{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </address>
+
+                        <div class="col-sm-6 pr-sm-0 pl-sm-5 px-0">
+                            {% if address.country.is_shipping_country and not address.is_default_for_shipping %}
+                            <a href="{% url 'customer:address-change-status' pk=address.id action='default_for_shipping' %}" class="btn btn--primary btn-wrap w-100 px-4 d-flex align-items-center justify-content-center">
+                                {% trans 'Set as default shipping address' %}
+                            </a>
+                            {% endif %}
+                            {% if not address.is_default_for_billing %}
+                            <a href="{% url 'customer:address-change-status' pk=address.id action='default_for_billing' %}" class="btn--link c-smartone d-block text-sm-right mt-2">
+                                {% trans 'Set as default billing address' %}
+                            </a>
+                            {% endif %}
+    
+                            <div class="btn-group address-controls d-flex justify-content-sm-end mt-1">
+                                <a class="btn--link c-smartone" href="{% url 'customer:address-detail' pk=address.id %}">{% trans 'Edit' %}</a><span class="mx-2">|</span> 
+                                <a href="{% url 'customer:address-delete' pk=address.id %}" class="btn--link c-smartone">
+                                    {% trans 'Delete' %}
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+           </div>
+        </div>
+        {% endfor %}
+    </div>
+
+        {% include "oscar/partials/pagination.html" %}
+    {% else %}
+        <p>{% trans 'There are no addresses in your address book.' %}</p>
+    {% endif %}
+    <p class="mt-30">
+        <a href="{% url 'customer:address-create' %}" class="btn btn--primary btn-newaddress px-5">{% trans 'Add a new address' %}</a>
+    </p>
+{% endblock tabcontent %}

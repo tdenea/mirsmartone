@@ -1,0 +1,48 @@
+{% load history_tags %}
+{% load basket_tags %}
+{% load currency_filters %}
+{% load image_tags %}
+{% load i18n %}
+
+
+{% if request.basket.num_lines %}
+<div class="cart-overview">
+    <ul class="list-unstyled">
+        {% for line in request.basket.all_lines %}
+            <li>
+                {% with image=line.product.primary_image %}
+                    {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+                    <a href="{{ line.product.get_absolute_url }}">
+                        <img src="{{ thumb.url }}" alt="{{ line.product.get_title }}" class="img-fluid">
+                    </a>
+                {% endwith %}
+                <div class="product-meta"> 
+                    <h5 class="product-title text-uppercase">
+                        <a href="{{ line.product.get_absolute_url }}">{% if LANGUAGE_CODE == 'it' %}{{ line.product.title }}{% else %}{{ line.product.title_en }}{% endif %}</a>
+                    </h5>
+                    <p class="product-qunt">{% trans "Quantity" %}:  {{ line.quantity }}</p>
+                    <p class="product-price">{{ line.unit_price_excl_tax|currency:request.basket.currency }}</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="cart-total">
+    <div class="total-desc">
+        {% trans "Total:" %} 
+    </div>
+    <div class="total-price">
+        {% if request.basket.is_tax_known %}
+            {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+        {% else %}
+            {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+        {% endif %}
+    </div>
+</div>
+<div class="cart--control d-flex justify-content-between">
+    <a class="btn btn--white btn--bordered btn-wrap d-flex align-items-center justify-content-center" href="{% url 'basket:summary' %}">{% trans "View basket" %}</a>
+    <a class="btn btn--primary d-flex align-items-center justify-content-center" href="{% url 'checkout:index' %}">{% trans "Checkout" %}</a>
+</div>
+{% else %}
+<p class="mb-0">{% trans "Your basket is empty." %}</p>
+{% endif %}

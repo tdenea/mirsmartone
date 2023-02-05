@@ -1,0 +1,51 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Order preview" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=4 %}
+{% endblock %}
+
+{% block checkout_title %}
+    <!-- {% trans "Preview order" %} -->
+{% endblock %}
+
+{% block place_order %}
+    <form method="post" action="{% url 'checkout:preview' %}" id="place_order_form" class="mb-0">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="place_order" />
+
+        {% comment %}
+            When submitting sensitive data on the payment details page (eg a bankcard)
+            we don't want to save the data and so we pass the bound form to the preview
+            template and render it in a hidden div.  Then the payment information will
+            get re-submitted when the user confirms the order.
+        {% endcomment %}
+        <div style="display:none">
+            {% block hiddenforms %}{% endblock %}
+        </div>
+
+        <div class="w-100 mt-30">
+
+            {% if payment_method == 'paypal' %}
+                <a href="/checkout/paypal/payment/" class="btn btn--primary w-100 btn-block" title="Pay with PayPal">{% trans 'Pay Now' %}</a>
+            {% else %}
+            <button id='place-order' type="submit" class="btn btn--primary btn-block" data-loading-text="{% trans 'Submitting...' %}">{% trans "Place order" %}</button>
+            {% endif %}
+              
+        </div>
+    </form>
+{% endblock place_order %}
+
+{% block tracking_checkout_gtag %}
+if(typeof(gtag) !== 'undefined'){
+    gtag('event', 'set_checkout_option', {
+        'event_label': "Preview details",
+        "checkout_step": 3,
+        "checkout_option": "Preview details"
+    });
+}
+{% endblock %}

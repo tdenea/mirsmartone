@@ -1,0 +1,5 @@
+{% extends "oscar/communication/emails/base.txt" %}
+{% load i18n %}{% block body %}{% trans 'Thank you for registering.' %}
+
+{% trans 'Continue browsing the site' %}: mirsmartone.com
+{% endblock %}

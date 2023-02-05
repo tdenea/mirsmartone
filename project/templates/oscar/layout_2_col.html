@@ -1,0 +1,43 @@
+{% extends "oscar/layout.html" %}
+
+{% comment %}
+Keep the same header and footer as the standard layout template but override the
+main content area to split it into a sidebar and a content block
+{% endcomment %}
+{% block content_wrapper %}
+{% block breadcrumbs %}{% endblock %}
+
+<section class="pt-0">
+<div class="{% block content_wrapper_classes %}container page{% endblock %}">
+    
+    <div class="page_inner negative-inner">
+        
+        <div class="row">
+
+            <aside class="sidebar col-md-4 col-lg-3 mb-60">
+                <div class="card">
+                      {% block column_left %}{% endblock %}
+                    {% block column_left_extra %}{% endblock %}
+                </div>
+            </aside>
+
+            <div class="col-md-8 col-lg-9">
+                <div class="card py-5 px-4 px-lg-5">
+                    {% block header %}
+                    <div class="page-header">
+                        <h1>{% block headertext %}{% endblock %}</h1>
+                    </div>
+                    {% endblock %}
+    
+                    {% include "oscar/partials/alert_messages.html" %}
+    
+                    {% block pre_content %}{% endblock %}
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+
+        </div><!-- /row -->
+    </div><!-- /page_inner -->
+</div><!-- /container -->
+</section>
+{% endblock %}

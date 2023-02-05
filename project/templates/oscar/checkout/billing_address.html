@@ -1,0 +1,200 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load static i18n %}
+
+{% block title %}
+    {% trans "Billing address" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=2 %}
+{% endblock %}
+
+{% block checkout_title %}{% endblock %}
+
+{% block billing_address %}
+<div class="col-sm-12 col-md-7 col-lg-8">
+    <div class="card px-5 py-5">
+        <h3 class="mb-3" style="font-size: 24px;">{% trans "Vuoi la fattura?" %}</h3>
+        <hr>
+        <p class="mb-4 mt-3">{% trans 'Se desideri ricevere la fattura, spunta la casella seguente e poi compila tutti i campi, altrimenti continua.' %}</p>
+        <div class="form-group" id="group_id_requested_invoice_fake">
+            <div class=" form-check custom-control custom-checkbox">
+                <input type="checkbox" name="requested_invoice" id="id_requested_invoice_fake" class="custom-control-input">
+                <label for="id_requested_invoice_fake" class="col-form-label custom-control-label text-uppercase">
+                    {% trans "I would like an invoice" %}
+                </label>
+            </div>
+        </div>
+    
+        {% if user.is_authenticated %}
+        <div id="saved_addresses">
+            {% if addresses %}
+            <hr class="mb-5">
+            <h6 class="mb-4">{% trans "Scegli un indirizzo tra quelli salvati" %}</h6>
+            <!-- <a class="btn-link mb-4 c-cardionica d-block" href="#new_address">Oppure inserisci un nuovo indirizzo di fatturazione</a> -->
+                <div class="choose-block">
+                    <div class="row">
+                        {% for address in addresses %}
+                            {% block select_address_form %}
+                                <div class="col-12 mb-4">
+                                    <div class="cart-total-amount py-4 px-0 position-relative d-flex align-items-start justify-content-between"  style="border-bottom: 1px solid #e9f0f6;">
+                                        <address class="pr-50">
+                                            {% block select_address_fields %}
+                                                {% for field in address.active_address_fields %}
+                                                    <span {% if forloop.first %}class="text-bold"{% endif %}>{{ field }}</span>{% if address.active_address_fields|length == 8 %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 3 %}<br/> {% elif forloop.last %}{% else %},{% endif %}{% else %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 2 %}<br/> {% elif forloop.last %}{% else %},{% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endblock %}
+                                        </address>
+                                      
+                                        <form action="{% url 'checkout:billing-address' %}" method="post" id="select_billing_address_{{ address.id }}" class="col-5 px-0">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="bill_to" />
+                                            <input type="hidden" name="address_id" value="{{ address.id }}" />
+                                            {% if address.is_default_for_billing %}
+                                                <button type="submit" class="btn btn--primary bill-address" data-loading-text="{% trans 'Saving...' %}">{% trans "Usa il tuo indirizzo di fatturazione predefinito" %}</button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn--primary bill-address" data-loading-text="{% trans 'Saving...' %}">{% trans "Scegli come indirizzo di fatturazione" %}</button>
+                                            {% endif %}
+    
+                                            <div class="btn-group address-controls d-flex justify-content-end mt-2" >
+                                                <a href="{% url 'checkout:user-address-update' pk=address.id %}" class="btn--link c-smartone">{% trans "Edit" %}</a><span class="mx-2">|</span> 
+                                                <a href="{% url 'checkout:user-address-delete' pk=address.id %}" class="btn-remove-address btn--link c-smartone">{% trans "Delete" %}</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if forloop.counter|divisibleby:2 %}
+                                    </div><div class="row">
+                                {% endif %}
+                            {% endblock %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <h6 class="mt-30">{% trans "O inserisci nuovi dati di fatturazione" %}</h6>
+            {% endif %}
+        </div>
+        {% endif %}
+    
+        {% block new_address_form %}
+            <!-- <p class="mb-4">{% trans 'Se desideri ricevere la fattura, spunta la casella seguente e poi compila tutti i campi, altrimenti continua.' %}</p> -->
+            <div class="cart-shiping new-shipping-address form-general" id="new_address"> 
+                <form action="{% url 'checkout:billing-address' %}" method="post" id="new_billing_address">
+                    {% csrf_token %}
+                    {% include "oscar/partials/form_fields.html" with form=form  %}
+                    <div class="mt-4 d-flex justify-content-end">
+                        <button type="button" id="submitBillingDetails" class="btn btn--primary btn-wrap px-4" data-loading-text="{% trans 'Continuing...' %}"><span id="continueBtn">{% trans "No, continua" %}</span><span id="saveBtn">{% trans "Salva dati di fatturazione" %}</span></button>
+                    </div>
+                </form>
+            </div>
+        {% endblock %}
+    </div>
+
+</div>
+
+{% endblock billing_address %}
+
+{% block shipping_address %}{% endblock shipping_address %}
+{% block shipping_method %}{% endblock %}
+{% block payment_method %}{% endblock %}
+
+{% block extrascripts %}
+<script>
+
+    $('#submitBillingDetails').on("click touch", function(e){
+        console.log("aaaaa");
+        $("#new_billing_address").submit();
+    });
+
+    hideForm();
+
+    // per rendere carine le checkbox
+    var fc1 = $('#id_requested_invoice').closest('.form-check');
+    fc1.addClass('custom-control custom-checkbox form-check-invoice');
+    $('#id_requested_invoice').addClass('custom-control-input');
+    $('label[for="id_requested_invoice"]').addClass('custom-control-label');
+    $('#id_requested_invoice').detach().prependTo('.form-check-invoice');
+
+    // per rendere carine le checkbox
+    var fc2 = $('#id_terms_and_conditions_expressly').closest('.form-check');
+    fc2.addClass('custom-control custom-checkbox form-check-conditions');
+    $('#id_terms_and_conditions_expressly').addClass('custom-control-input');
+    $('label[for="id_terms_and_conditions_expressly"]').addClass('custom-control-label');
+    $('#id_terms_and_conditions_expressly').detach().prependTo('.form-check-conditions');
+
+
+    if ($('#id_requested_invoice_fake').is(':checked')) {
+        showForm();
+    }else{
+        hideForm();
+    }
+
+    $('#id_requested_invoice_fake').change(function(){
+        if ($(this).is(':checked')) {
+            showForm();
+            $('#id_requested_invoice').prop( "checked", true ) 
+        }else{
+            hideForm();
+            $('#id_requested_invoice').prop( "checked", false ) 
+        }
+    });
+
+    $('#group_id_requested_invoice').hide();
+    $('#id_requested_invoice').val($('#id_requested_invoice_fake').val());
+
+    function hideForm(){
+        $('#saved_addresses').hide();
+        $('#group_id_first_name').hide();
+        $('#group_id_last_name').hide();
+        $('#group_id_country').hide();
+        $('#group_id_state').hide();
+        $('#group_id_line4').hide();
+        $('#group_id_line1').hide();
+        $('#group_id_postcode').hide();
+        $('#group_id_cf').hide();
+        $('#group_id_piva').hide();
+        $('#group_id_phone_number').hide();
+        $('#group_id_terms_and_conditions_expressly').hide();
+        $("#id_terms_and_conditions_expressly").prop('required',false);
+
+        $('#saveBtn').hide();
+        $('#continueBtn').show();
+    }
+
+    function showForm(){
+        $('#saved_addresses').fadeIn();
+        $('#group_id_first_name').fadeIn();
+        $('#group_id_last_name').fadeIn();
+        $('#group_id_country').fadeIn();
+        $('#group_id_state').fadeIn();
+        $('#group_id_line4').fadeIn();
+        $('#group_id_line1').fadeIn();
+        $('#group_id_postcode').fadeIn();
+        $('#group_id_cf').fadeIn();
+        $('#group_id_piva').fadeIn();
+        $('#group_id_phone_number').fadeIn();
+        $('#group_id_terms_and_conditions_expressly').fadeIn();
+        $("#id_terms_and_conditions_expressly").prop('required',true);
+
+        $('#saveBtn').show();
+        $('#continueBtn').hide();
+    }
+
+    {% if billing_address.requested_invoice %}
+        showForm();
+        $('#id_requested_invoice_fake').prop( "checked", true )
+        $('#id_requested_invoice').prop( "checked", true )
+    {% endif %}
+</script>
+{% endblock %}
+
+{% block tracking_checkout_gtag %}
+if(typeof(gtag) !== 'undefined'){
+    gtag('event', 'set_checkout_option', {
+        'event_label': "Billing details",
+        "checkout_step": 2,
+        "checkout_option": "Billing details"
+    });
+}
+{% endblock %}

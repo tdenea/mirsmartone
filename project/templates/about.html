@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block layout %}
+
+<section id="about-gallery" class="about about-2 about-gallery-2 pt-0 pb-0 position-relative z-2">
+    <div class="container-fluid container-padding">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-5 px-0 order-2 order-lg-1">
+                <div class="carousel owl-carousel" data-slide="1" data-slide-rs="1" data-autoplay="true" data-nav="false" data-dots="false" data-space="0" data-loop="true" data-speed="800" style="position: sticky; top: 100px; left: 0;">
+                    <div class="gallery--item">
+                        <img src="/static/img/about/ragazza.jpg" alt="{% trans 'Ragazza che usa Smart One' %}">
+                    </div>
+                    <div class="gallery--item">
+                        <img src="/static/img/about/madre-figlio.jpg" alt="{% trans 'Ragazza che usa Smart One' %}">
+                    </div>
+                    <div class="gallery--item">
+                        <img src="/static/img/about/smartoneoxi-app.jpg" alt="{% trans 'Ragazza che usa Smart One' %}">
+                    </div>
+                    <div class="gallery--item">
+                        <img src="/static/img/about/signore.jpg" alt="{% trans 'Ragazza che usa Smart One' %}">
+                    </div>
+                </div>
+            </div>
+            <!-- .col-lg-6 end -->
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-5 mx-auto mt-100 mb-50 mb-130-lg order-1 order-lg-2">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12 pt-100">
+
+                        <img src="/static/img/mir-orange.svg" alt="logo MIR" class="img-fluid d-block mb-40" style="width: 55%; max-width: 250px;" data-aos="fade">
+                        <h2 class="tlt" style="line-height: 1.2;" data-aos="fade">{% trans 'Innovation in Spirometry, Oximetry and MedTech solutions' %}</h2>
+
+                        <div class="mb-70" data-aos="fade">
+                            <p><strong>{% trans 'MIR – Medical International Research is a global medical device leader in Spirometry, Oximetry and MedTech solutions.' %}</strong></p>
+                            <p>{% blocktrans %}<strong>Founded in 1993</strong>, MIR today is present in more than <strong>100 countries worldwide</strong>, making its most <strong>innovative technology</strong> available to healthcare professionals and their patients in the pneumology sector by pairing a series of new, reliable, and ready–to–use smartphone–compatible Smart devices with its professional line of products <strong>to help facilitate more comprehensive personal health monitoring</strong>.{% endblocktrans %}
+                            </p>
+                            <p>{% blocktrans %}For more than 25 years, we have been <strong>internationally recognized</strong> for our numerous innovations and advancements. The products we are designing today, will be more exciting and more innovative than anything you have seen before.{% endblocktrans %}
+                            </p>
+                        </div>
+
+                    </div>
+                    <!-- .col-lg-12 end -->
+                </div>
+                <!-- .row end -->
+                <div class="row feature-1">
+                    <!--  feature panel #1 -->
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="feature-panel">
+                            <div class="feature--icon">
+                                <i class="icon-bolt"></i>
+                            </div>
+                            <!-- .feature-icon end -->
+                            <div class="feature--content">
+                                <h3>{% trans "29 Years of Experience" %}</h3>
+                                <p class="text-uppercase">{% trans "300K Products sold" %}</p>
+                            </div>
+                            <!-- .feature-content end -->
+                        </div>
+                    </div>
+                    <!-- .feature-panel end -->
+                    <!--  feature panel #2 -->
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="feature-panel">
+                            <div class="feature--icon">
+                                <i class="icon-location"></i>
+                            </div>
+                            <!-- .feature-icon end -->
+                            <div class="feature--content">
+                                <h3>{% trans "100 worldwide countries" %}</h3>
+                                <p class="text-uppercase">{% trans "Innovative offerings" %}</p>
+                            </div>
+                            <!-- .feature-content end -->
+                        </div>
+                    </div>
+                    <!-- .feature-panel end -->
+                    <!--  feature panel #3 -->
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="feature-panel">
+                            <div class="feature--icon">
+                                <i class="icon-phone"></i>
+                            </div>
+                            <!-- .feature-icon end -->
+                            <div class="feature--content">
+                                <h3>{% trans "16% invested in Research" %}</h3>
+                                <p class="text-uppercase">{% trans "Projects and Partnerships" %}</p>
+                            </div>
+                            <!-- .feature-content end -->
+                        </div>
+                    </div>
+                    <!-- .feature-panel end -->
+                    <!--  feature panel #4 -->
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="feature-panel">
+                            <div class="feature--icon">
+                                <i class="icon-link icon-md"></i>
+                            </div>
+                            <!-- .feature-icon end -->
+                            <div class="feature--content">
+                                <h3>{% trans "8 international patents" %}</h3>
+                                <p class="text-uppercase">{% trans "And Local import certifications" %}</p>
+                            </div>
+                            <!-- .feature-content end -->
+                        </div>
+                    </div>
+                    <!-- .feature-panel end -->
+                </div>
+                <!-- .row end -->
+            </div>
+            <!-- .col-lg-6 end -->
+        </div>
+        <!-- .row end -->
+    </div>
+    <!-- .container end -->
+</section>
+<!-- #about gallery end -->
+
+<section class="bg-lightBlue about" style="margin-top: -80px;">
+    <div class="container text-center pt-5">
+        <div class="row">
+            <div class="col-xl-10 mx-auto about--text mb-0">
+                <p class="" >{% blocktrans %}Our last innovations are <a href="{{smartone.get_absolute_url}}" class="text-uppercase" style='font-variation-settings: "wght" 700;'>Smart one</a> and <a href="{{smartoneoxi.get_absolute_url}}" class="text-uppercase" style='font-variation-settings: "wght" 700;'>Smart one oxi</a>: the first app-based personal Spirometers (PEF,FEV1), with or without embedded Oximeter (SpO2, Pulse), now available on your SmartPhone and Tablet, via Bluetooth Smart 4.0. {% endblocktrans %}
+                </p>
+                <p class="mb-0">{% trans "A step forward in self-management of health conditions." %}</p>
+            </div>
+        </div>
+        
+    </div>
+    
+</section>
+
+
+<section class="pt-100 pb-100" style="overflow: hidden;">
+    <div class="watch-face watch-face-topright position-absolute">
+        <div class="circle" style="--ca: -70deg"></div>
+        <div class="circle" style="--ca: -30deg"></div>
+        <div class="circle" style="--ca: 10deg"></div>
+        <div class="circle" style="--ca: 50deg"></div>
+        <div class="circle" style="--ca: 90deg"></div>
+        <div class="circle" style="--ca: 130deg"></div>
+        <div class="circle" style="--ca: 170deg"></div>
+        <div class="circle" style="--ca: 210deg"></div>
+        <div class="circle" style="--ca: 250deg"></div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="heading heading-2">
+                    <h2 class="heading--title" data-aos="fade">{% trans 'Certificates' %}</h2>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-7">
+                <div class="pr-4" data-aos="fade">
+                    <p>{% trans 'MIR solutions for HealthCare are CE Marked and FDA cleared. A wide range of local import certifications have also been accomplished, making MIR products available in your country. MIR is internationally recognized for the uniqueness of our patented products.' %}</p>
+
+                    <p>{% trans "International Patent granted for the Design of Smart One and Smart One Oxi." %}</p>
+
+                    <small class="mt-5 d-block" style="font-size: 90%; opacity: .7;">{% trans "*Waiting for Smart One Oxi" %}</small>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-5">
+                <div class="text" data-aos="fade" data-aos-delay="250">
+                    {% blocktrans %}
+                    <ul>
+                        <li>American Thoracic Society</li>
+                        <li>European Respiratory Society</li>
+                        <li>ISO 26782 for Spirometry</li>
+                        <li>ISO 23747 for Peak Flow</li>
+                        <li>ISO 80601-2-61 for Oximetry</li>
+                    </ul>
+                    {% endblocktrans %}
+                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    $(window).scroll(function() {
+        $(".heading--title").each(function(){
+            var top_of_element = $(this).offset().top;
+            var bottom_of_element = $(this).offset().top + $(this).outerHeight();
+            var bottom_of_screen = $(window).scrollTop() + window.innerHeight;
+            var top_of_screen = $(window).scrollTop();
+
+            if((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element)){
+                $(this).addClass('tlt');
+                $(this).textillate({ in: { effect: 'fadeIn', delay: 20 } });
+            }
+        });
+    });
+</script>
+{% endblock %}

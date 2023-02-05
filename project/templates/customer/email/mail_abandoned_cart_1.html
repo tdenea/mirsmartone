@@ -1,0 +1,54 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load currency_filters i18n thumbnail %}
+
+{% block tbody %}
+<tr>
+  <td class="content-block">
+      <p xmlns="http://www.w3.org/1999/html">{% if user_data.first_name %}{% trans 'Buongiorno' %} {{user_data.first_name}},{% else %}{% trans 'Buongiorno,' %}{% endif %}</p>
+      <p>{% blocktrans %}sembra che uno dei nostri prodotti sia stato abbandonato nel tuo carrello. Hai cambiato idea?<br/>
+        Torna sul sito al più presto, il prodotto sarà ancora disponibile nel tuo carrello per essere acquistato.{% endblocktrans %}</p>
+        <p><a href="https://{{ site }}/" target="_blank"><strong>{% trans 'Torna sul sito' %}</strong></a>.</p>
+  </td>
+</tr>
+
+<tr>
+  <td class="content-block">
+    <table class="order" width="100%" cellpadding="0" cellspacing="0">
+      <tbody>
+        <tr>
+          <td><b>{% trans 'Il tuo carrello contiene:' %}</b></td>
+        </tr>
+        <tr>
+          <td>
+            <table class="order-items" width="100%" cellpadding="0" cellspacing="0">
+              <tbody>
+                {% for product in products %}
+                <tr>
+                  <td width="64">
+                    <a style="display: block;" href="https://{{ site }}{{product.get_absolute_url}}">
+                      <img src="https://{{ site }}{{ product.img }}" alt="{{ product.name }}">
+                    </a>
+                  </td>
+                  <td colspan="2" style="padding: 10px;">
+                    <a href="https://{{ site }}{{product.get_absolute_url}}">{{ product.name }}</a> &times; {{ product.quantity }}<br>
+                  </td>
+                  <td class="alignright">{{ product.total_price|currency:product.currency }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td class="content-block" valign="middle" align="center" style="padding-top: 20px;">
+    <p style="text-align: center;"><a href="https://{{site}}/shop/basket/" target="_blank" class="btn-primary">{% trans 'Vai al tuo carrello' %}</a></p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

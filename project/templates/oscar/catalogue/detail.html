@@ -1,0 +1,1211 @@
+{% extends "oscar/layout.html" %}
+
+{% load history_tags %}
+{% load currency_filters %}
+{% load reviews_tags %}
+{% load product_tags %}
+{% load display_tags %}
+{% load i18n static wagtailcore_tags poll_extras image_tags %}
+{% load purchase_info_tags %}
+
+{% block title %}
+    {{ product.get_meta_title }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+    {{ product.get_meta_description }}
+{% endblock %}
+
+{% block styles %}
+    <!-- <link rel="stylesheet" href="/static/css/juxtapose.css"> -->
+{% endblock %}
+
+{% block extra_meta %}
+<!-- fb meta -->
+<meta property="og:title" content="{{ product.get_title }}" />
+<meta property="og:type" content="product" />
+<meta property="og:url" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ product.get_absolute_url }}" />
+{% with image=product.primary_image %}
+{% oscar_thumbnail image.original "1024x1024" crop="center" as img %}
+<meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ img.url }}" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="1024" />
+<meta property="og:image:alt" content="{{ product.title }}" />
+{% endwith %}
+{% if not session %}
+    {% purchase_info_for_product request product as session %}
+{% endif %}
+<meta property="og:price:amount" content="{{ session.price.incl_tax|replace_commas }}" />
+<meta property="product:price:currency" content="{{ session.price.currency }}">
+<meta property="product:availability" content="{% if session.availability.is_available_to_buy %}in stock{% else %}out of stock{% endif %}">
+<meta property="product:condition" content="new">
+<meta property="product:retailer_item_id" content="{{ product.upc }}">
+<meta property="product:gtin" content="{{ product.gtin }}">
+<meta property="product:brand" content="Smart One">
+<meta property="og:description" content="{% if product.get_title == 'Smart One' %}{% trans 'description_smart_one' %}{% endif %}{% if product.get_title == 'Smart One Oxi' %}{% trans 'description_smart_one_oxi' %}{% endif %}" />
+<meta property="og:locale" content="{{ LANGUAGE_CODE }}">
+
+<!-- twitter meta -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ product.get_title }}">
+<meta name="twitter:description" content="{% if product.get_title == 'Smart One' %}{% trans 'description_smart_one' %}{% endif %}{% if product.get_title == 'Smart One Oxi' %}{% trans 'description_smart_one_oxi' %}{% endif %}">
+<meta name="twitter:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ product.primary_image.original.url }}">
+{% endblock %}
+
+{% block header_wrapper %}
+{% endblock %}
+
+{% block nav_accounts %}
+{% endblock %}
+
+
+{% block breadcrumbs %}
+    {% comment %}
+    <!-- <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            {% with category=product.get_categories.first %}
+                {% for c in category.get_ancestors_and_self %}
+                    <li class="breadcrumb-item"><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+                {% endfor %}
+                <li class="breadcrumb-item active" aria-current="page">{{ product.get_title }}</li>
+
+                {% get_back_button as backbutton %}
+                    {% if backbutton %}
+                        <li class="float-right">
+                            <a href="{{ backbutton.url }}">
+                                <i class="fas fa-arrow-left"></i> {{ backbutton.title }}
+                            </a>
+                        </li>
+                    {% endif %}
+            {% endwith %}
+        </ol>
+    </nav> -->
+    {% endcomment %}
+{% endblock %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+
+<div itemscope itemtype="http://schema.org/Product">
+<section id="product-detalis10" class="product-detalis product-detalis-3" >
+    <div class="container-large pt-5 pt-lg-0">
+        <div class="row">
+            
+            {% block product_gallery %}
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-7 mb-5 mb-lg-0">
+                <div>
+                    {% include "oscar/catalogue/partials/gallery2.html" %}
+                </div>
+            </div>
+            {% endblock %}
+
+            {% block product_main %}
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-5 col-content"  >
+                <div class="px-lg-3 py-4 sticky-top" style="position: sticky; top: 120px; width: 100%">
+                    <div class="product--title text-uppercase">
+                        <h1 itemprop="name" class="mb-2">{% if LANGUAGE_CODE == 'it' %}{{ product.title }}{% else %}{{ product.title_en }}{% endif %}</h1>
+                    </div>
+
+                    <div class="product--price mb-5">
+                        {% block product_stock_record %}
+                            {% include "oscar/catalogue/partials/stock_record.html" with verbose=1 %}
+                        {% endblock %}
+                    </div>
+    
+                    {% if product.upc == "smartone" %}
+                        {% blocktrans %}
+                        <h5 class="mb-3">App-Based Personal Spirometer (PEF,FEV1) </h5>
+                        <p>Peak Flow and FEV1 now available on your Smartphone and Tablet, via Bluetooth Smart 4.0. Ideal in the self management of Asthma, COPD, Lung Transplant care, Cystic Fibrosis and for use in Clinical Trials.</p>
+                        <p>Suitable for everyone and all ages from 5-93 years.</p>
+                        <p>Simple and intuitive App for Smartphone and Tablet, always included for iOS and Android.</p>
+                        {% endblocktrans %}
+                    {% endif %}
+
+                    {% if product.upc == "smartoneoxi" %}
+                        {% blocktrans %}
+                        <h5 class="mb-3">App-based personal Spirometer (PEF,FEV1) with embedded Oximeter (SpO2, Pulse) </h5>
+                        <p>Everything in a single instrument: it measures two Oximetry parameters (%SpO2 and Heart Rate) and two spirometry parameters (PEF and FEV1). It includes the innovative reflectance pulse-oximetry sensor (Touch).</p>
+                        <p>Suitable for everyone and all ages from 5-93 years.</p>
+                        <p>It connects to your Smartphone/Tablet via Bluetooth. Via the simple and intuitive App, always included for iOS and Android, you can view test results in real-time, save and share them.</p>
+                        {% endblocktrans %}
+                    {% endif %}
+
+                    {% if product.upc == "set_turbina_boccaglio" %}
+                        {% blocktrans %}
+                        <p>The turbine is compatible with the following MIR spirometers: Smart One, Smart One Oxi, Spirobank Smart, Spirobank Oxi.</p>
+                        <p>The turbine is not compatible with other MIR - Medical International Research spirometers.</p>
+                        <p>Turbine and Mouthpiece are individually sealed and packed in a protective cardboard box.</p>
+                        <p>The Turbine and Mouthpiece cannot be purchased separately.</p>
+                        {% endblocktrans %}
+                    {% endif %}
+    
+                    <div class="product--meta">
+                        <div class="product--meta-action mb-0 mt-40">
+                            <div class="mb-40">
+                            {% if not product.is_parent %}
+                                {% block product_basket_form %}
+                                    {% include "oscar/catalogue/partials/add_to_basket_form.html" %}
+                                {% endblock %}
+                            {% else %}
+                                {% block variants %}
+                                    <h2>{% trans 'Variants:' %}</h2>
+                                    {% for child in product.children.public %}
+                                        {% purchase_info_for_product request child as child_session %}
+                                        {% if child_session.availability.is_available_to_buy %}
+                                            <a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a><br>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endblock %}
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+
+        </div>
+    </div>
+</section>
+<!-- #product detalis end -->
+
+
+
+{% if product.upc == "smartone" %}
+
+    <section id="cat-list" class="cat-list bg-lightBlue text-center-xs pt-140 pt-xs-60 pb-0 position-relative" style="">
+        <div class="watch-face watch-face-topleft position-absolute">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 order-md-1 col-md-9 col-lg-9">
+                    <div class="heading heading-2 text--right text-center-xs mb-5">
+                        <p class="heading--subtitle text-uppercase">{% trans "Mir Smart One™ APP for Smartphone and Tablet" %}</p>
+                        <h2 class="heading--title">{% trans "How to use smart one" %}</h2>
+                    </div>
+                </div>
+                <div class="col-sm-12 order-md-0 col-md-3 col-lg-3 mb-30-xs">
+                    <div class="divider--line"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-3 mb-4">
+                    <div class="cat--list-desc">
+                        <p>{% trans "Quick Guide: Smart One automatically connects, then ensure a tight seal around mouthpiece, hold the device without covering the turbine, take a deep breath and exhale as hard and fast as possible." %}</p>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="embed-responsive embed-responsive-16by9">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/bHF75FBLpZo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="img-rounded"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="" class="product-detalis-2 pb-5">
+        <div id="description" class="container">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-8">
+                    <div class="product--desc" data-aos="fade">
+                        {% blocktrans %}
+                        <p>Spirometro personale tascabile, è usato per controllare la saturazione del sangue, tenere sotto controllo eventuali patologie polmonari come asma o fibrosi cistica o, semplicemente, monitorare la salute dei tuoi polmoni. In particolare <strong>misura i valori del picco di flusso e FEV1</strong> direttamente sul tuo smartphone via Bluetooth.</p>
+                        <p>Si connette al tuo Smartphone/Tablet via Bluetooth. Tramite la App Medicale gratuita MIR Smat One, puoi visualizzare i risultati dei test in tempo reale, salvarli e condividerli con il tuo medico o con chi vuoi, direttamente dal tuo Smartphone/Tablet. L'APP MIR Smart One è inclusa (per iOS e Android).</p>
+                        <p><strong>È un dispositivo medico detraibile dalle spese sanitarie</strong>. Facile da usare e sempre pronto all'uso. Adatto a tutti dai 5 ai 93 anni. Può essere condiviso da tutta la famiglia. Lo spirometro personale tascabile SMART ONE è particolarmente adatto ai soggetti asmatici, con problemi respiratori o affetti da BPCO, agli sportivi ed ai fumatori, per tenere sotto controllo lo stato di salute dei propri polmoni.
+                        </p>
+                        {% endblocktrans %}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-0">
+                    <div class="product--desc-list" data-aos="fade">
+                        <h6 class="text-bold">{% trans "Specifications" %}</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li>{% trans "Dimensions:" %}	10.9 x 2.1 x 4.9 cm</li>
+                            <li>{% trans "Weight: 61 grammi" %}</li>
+                            <li>{% trans "Produttore:" %}	MIR srl - Medical International Research </li>
+                            <li>ASIN: B01EVLE4J6 </li>
+                            <li>{% trans "Pile: 2 AAA pile necessarie. (incluse)" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </section>
+
+
+    {% get_one_and_set request as product_total_one_set %}
+    {% if product_total_one_set %}
+    <section class="pt-0" id="SoldTogether">
+        <div class="container text-center">
+            <div class="pt-60 sold-together">
+                <h4 class="mb-5" data-aos="fade">{% trans "Buy together with the Reusable Turbine and Mouthpiece" %}</h4>
+                <form action=""  data-aos="fade">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-center">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="otherprod">
+                                <a href="{{SMARTONE.get_absolute_url}}" class="d-flex flex-column align-items-center justify-content-center">
+                                    {% with smartone_image=SMARTONE.primary_image %}
+                                    {% oscar_thumbnail smartone_image.original "200x200" crop="center" as smartone_thumb %}
+                                    <img src="{{smartone_thumb.url}}" alt="{{SMARTONE.get_title}}" style="width: 100px; height: 100px;  border-radius:3px">
+                                    {% endwith %}
+                                    <h6 class="mb-0 mt-2">{{SMARTONE.get_title}}</h6>
+                                </a>
+                            </div>
+                            <span class="d-inline-block mx-4 mb-4 text-bold text-black" style="font-size: 28px;">+</span>
+                            <div class="otherprod">
+                                <a href="{{SET_TURBINA.get_absolute_url}}" class="d-flex flex-column align-items-center">
+                                    {% with set_turbina_image=SET_TURBINA.primary_image %}
+                                    {% oscar_thumbnail set_turbina_image.original "300x200" crop="center" as set_turbina_thumb %}
+                                    <img src="{{set_turbina_thumb.url}}" alt="{% trans 'Set Turbina e Boccaglio di Ricambio' %}" style="width: 150px; height: 100px; border-radius:3px">
+                                    {% endwith %}
+                                    <h6 class="mt-2 mb-0" style="max-width: 256px;">{% trans "Set Turbina e Boccaglio di Ricambio" %}</h6>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-4 mt-md-0 ml-md-5">
+                            <p class="mb-2" style="font-size: 16px;">{% trans "Total price" %}: <span class="text-bold color_price">{{product_total_one_set|currency}}</span></p>
+                            <button class="btn btn--primary w-auto px-4" type="button" id="addBothToCartOne" data-loading-text="{% trans 'Adding...' %}" onclick="clickEventAnalytics('Add both to cart');">{%trans "Add both to cart" %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+
+    <section id="" class="cat-list bg-lightBlue text-center-xs pt-140 pt-xs-60 pb-0">
+        <div class="watch-face watch-face-bottomright position-absolute" style="margin-bottom: 150px;">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+          </div>
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <div class="heading heading-2 text-center-xs mb-0">
+                        <p class="heading--subtitle text-uppercase">{% trans "Perché scegliere gli spirometri smart one" %}</p>
+                        <h2 class="heading--title">{% trans "L'app MIR Smart One" %}</h2>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3 mb-30-xs text--right">
+                    <div class="divider--line divider--line-right"></div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-9">
+                    <div class="cat--list-desc">
+                        <p>{% trans "L'app MIR Smart One ti permette di tenere sotto controllo la salute dei tuoi polmoni in autonomia, ancora prima di rivolgerti al tuo medico. L'APP è disponibile in 20 lingue. Visualizza istantaneamente i risultati dopo aver soffiato." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-9 order-xl-1 col-xl-3 mb-4">
+                    <div class="cat--list-desc">
+                        <p>{% blocktrans %}Tieni un diario su cui annotare sintomi e note aggiuntive per ogni test.
+                            Vedi il trend dei tuoi risultati per avere un quadro preciso dello stato di forma dei tuoi polmoni nel tempo.
+                            Condividi i risultati dei tuoi test in tempo reale con chi vuoi tramite Mail, WhatsApp, SMS ecc." {% endblocktrans %}</p>
+                    </div>
+                </div>
+                <div class="row col-12 order-xl-0 col-xl-9 justify-content-center">
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartone/MIR-Smartone-eCommerce-02.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "Easy to use" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartone/MIR-Smartone-eCommerce-01.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "Real time test" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartone/smart-one-app-PDF_Report_pag_02.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "COMPLIANCE WITH ATS/ERS 2019" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonial4" class="testimonial testimonial-4 pt-150 pb-100 pt-xs-60 pb-xs-60">
+        <div class="container">
+            <div class="row">
+                <div class="col-10 col-md-10 ">
+                    <div class="heading heading-2 mb-5">
+                        <h2 class="heading--title">{% trans "Satisfied customers" %}</h2>
+                    </div>
+                </div>
+            </div>
+            {% include "includes/testimonial_slider.html" %}
+        </div>
+    </section>
+
+    <section class="pt-0">
+        <div class="container-large">
+            <div class="banner-smartone">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-md-5 col-lg-4 col-xl-4">
+                            <div class="banner-smartone-content px-3 text-center text-md-left px-md-0" data-aos="fade">
+                                <div>
+                                    <h3>{% trans "Looking for Smart One Oxi?" %}</h3>
+                                    <p class="mb-5">{% blocktrans %}If you want to keep track of your <strong>blood oxygen levels</strong>, Smart One Oxi has an innovative reflectance pulse-oximetry sensor (Touch). Easy to use and accurate.{% endblocktrans %}</p>
+                                    <a href="{{ SMARTONEOXI.get_absolute_url }}" class="btn btn--primary btn--rounded px-5 w-auto">{% trans "View Smart One Oxi" %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endif %}
+
+
+
+{% if product.upc == "smartoneoxi" %}
+
+    <section id="cat-list" class="cat-list bg-lightBlue text-center-xs pt-140 pt-xs-60 pb-0 position-relative">
+        <div class="watch-face watch-face-topleft position-absolute">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 order-md-1 col-md-8 col-lg-9">
+                    <div class="heading heading-2 text--right text-center-xs mb-5">
+                        <p class="heading--subtitle text-uppercase">{% trans "Innovativo sensore touch + turbina mir" %}</p>
+                        <h2 class="heading--title">{% trans "Introducing Smart one oxi" %}</h2>
+                    </div>
+                </div>
+                <div class="col-sm-12 order-md-0 col-md-4 col-lg-3 mb-30-xs">
+                    <div class="divider--line"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-xl-3 mb-4">
+                    <div class="cat--list-desc">
+                        <p>{% trans "In un solo strumento personale, un ossimetro con innovativo sensore “touch” e uno spirometro che sfrutta la tecnologia MIR (MIR Single Patient Reusable turbine flow sensor) connessi ad una app per smartphone e tablet. Per un test da fare a casa come e quando vuoi, in completa sicurezza." %}</p>
+                    </div>
+                </div>
+                <div class="col-xl-9">
+                    <div class="embed-responsive embed-responsive-16by9">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dPFA6Wy3cSc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="img-rounded"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="" class="product-detalis-2 pb-5">
+        <div id="description" class="container">
+            <div class="row">
+
+                <div class="col-sm-12 col-md-12 col-lg-8">
+                    <div class="product--desc" data-aos="fade">
+                        <p>{% trans "Smart One Oxi è il primo ossimetro con innovativo sensore “touch” e spirometro integrato. Permette di mantenere il controllo dei valori della saturazione dell'ossigeno nel sangue (SpO2) per l'ossimetria e la Frequenza Cardiaca (BPM), e del Picco di Flusso (PEF) e FEV1 per la spirometria, con un solo dispositivo." %}</p>
+
+                        <p>{% trans "Si connette al tuo Smartphone/Tablet via Bluetooth. Tramite la App Medicale gratuita MIR Smat One, puoi visualizzare i risultati dei test in tempo reale, salvarli e condividerli con il tuo medico o con chi vuoi, direttamente dal tuo Smartphone/Tablet. L'APP MIR Smart One è inclusa (per iOS e Android)." %}</p>
+
+                        <p>{% trans "È un dispositivo medico detraibile dalle spese sanitarie. Facile e sempre pronto all'uso. Adatto a tutti dai 5 ai 93 anni. Può essere condiviso da tutta la famiglia." %}</p>
+                            
+                        <h6 class="mt-40 mb-15">{% trans "A chi è rivolto?" %}</h6>
+                        <p>{% trans "Lo SMART ONE OXI è particolarmente adatto a:" %}</p>
+                        <ul>
+                            <li>{% trans "Persone asmatiche." %}</li>
+                            <li>{% trans "Persone con problemi respiratori (come BPCO, fibrosi cistica)." %}</li>
+                            <li>{% trans "Persone con condizioni che influenzano la saturazione dell’ossigeno nel sangue." %}</li>
+                            <li>{% trans "Persone in Ossigenoterapia e che utilizzano supporti alla ventilazione." %}</li>
+                            <li>{% trans "Persone che assumono farmaci che influenzano la Respirazione o la Saturazione di Ossigeno." %}</li>
+                            <li>{% trans "Sportivi ed atleti che vogliono monitorare la capacità polmonare." %}</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-md-12 col-lg-4">
+                    <div class="product--desc-list" data-aos="fade">
+                        <h6 class="text-bold">{% trans "Specifications" %}</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li>{% trans "Dimensions:" %}	10.9 x 2.1 x 4.9 cm</li>
+                            <li>{% trans "Weight: 380 grammi" %}</li>
+                            <li>{% trans "Produttore:" %} MIR srl - Medical International Research</li>
+                            <li>ASIN: B08BTSFNQ8</li>
+                            <li>{% trans "Pile: 2 AAA pile necessarie. (incluse)" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </section>
+
+
+    {% get_oxi_and_set request as product_total_oxi_set %}
+    {% if product_total_oxi_set %}
+    <section class="pt-0" id="SoldTogether">
+        <div class="container text-center">
+            <div class="pt-60 sold-together">
+                <h4 class="mb-5" data-aos="fade">{% trans "Buy together with the Reusable Turbine and Mouthpiece" %}</h4>
+                <form action="" data-aos="fade">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-center">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="otherprod">
+                                <a href="{{SMARTONEOXI.get_absolute_url}}" class="d-flex flex-column align-items-center justify-content-center">
+                                    {% with smartoneoxi_image=SMARTONEOXI.primary_image %}
+                                    {% oscar_thumbnail smartoneoxi_image.original "200x200" crop="center" as smartoneoxi_thumb %}
+                                    <img src="{{smartoneoxi_thumb.url}}" alt="{{SMARTONEOXI.get_title}}" style="width: 100px; height: 100px;  border-radius:3px">
+                                    {% endwith %}
+                                    <h6 class="mb-0 mt-2">{{SMARTONEOXI.get_title}}</h6>
+                                </a>
+                            </div>
+                            <span class="d-inline-block mx-4 mb-4 text-bold text-black" style="font-size: 28px;">+</span>
+                            <div class="otherprod">
+                                <a href="{{SET_TURBINA.get_absolute_url}}" class="d-flex flex-column align-items-center">
+                                    {% with set_turbina_image=SET_TURBINA.primary_image %}
+                                    {% oscar_thumbnail set_turbina_image.original "300x200" crop="center" as set_turbina_thumb %}
+                                    <img src="{{set_turbina_thumb.url}}" alt='{% trans "Set Turbina e Boccaglio di Ricambio" %}' style="width: 150px; height: 100px; border-radius:3px">
+                                    {% endwith %}
+                                    <h6 class="mt-2 mb-0" style="max-width: 256px;">{% trans "Set Turbina e Boccaglio di Ricambio" %}</h6>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-4 mt-md-0 ml-md-5">
+                            <p class="mb-2" style="font-size: 16px;">{% trans "Total price" %}: <span class="text-bold color_price">{{product_total_oxi_set|currency}}</span></p>
+                            <button class="btn btn--primary w-auto px-4" type="button" id="addBothToCartOxi" data-loading-text="{% trans 'Adding...' %}" onclick="clickEventAnalytics('Add both to cart');">{%trans "Add both to cart" %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+
+    <section id="" class="cat-list bg-lightBlue text-center-xs pt-140 pt-xs-60 pb-0">
+        <div class="watch-face watch-face-bottomright position-absolute" style="margin-bottom: 150px;">
+            <div class="circle" style="--ca: -70deg"></div>
+            <div class="circle" style="--ca: -30deg"></div>
+            <div class="circle" style="--ca: 10deg"></div>
+            <div class="circle" style="--ca: 50deg"></div>
+            <div class="circle" style="--ca: 90deg"></div>
+            <div class="circle" style="--ca: 130deg"></div>
+            <div class="circle" style="--ca: 170deg"></div>
+            <div class="circle" style="--ca: 210deg"></div>
+            <div class="circle" style="--ca: 250deg"></div>
+        </div>
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-sm-12 col-md-8 col-lg-8">
+                    <div class="heading heading-2 text-center-xs mb-0">
+                        <p class="heading--subtitle text-uppercase">{% trans "Perché scegliere smart one oxi" %}</p>
+                        <h2 class="heading--title">{% trans "L'app MIR Smart One" %}</h2>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 mb-30-xs text--right">
+                    <div class="divider--line divider--line-right"></div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-9">
+                    <div class="cat--list-desc">
+                        <p>{% trans "L'app MIR Smart One ti permette di tenere sotto controllo la salute dei tuoi polmoni in autonomia, ancora prima di rivolgerti al tuo medico. L'APP è disponibile in 20 lingue. Visualizza istantaneamente i risultati dopo aver soffiato." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-9 order-xl-1 col-xl-3 mb-4">
+                    <div class="cat--list-desc">
+                        <p>{% blocktrans %}Tieni un diario su cui annotare sintomi e note aggiuntive per ogni test.
+                            Vedi il trend dei tuoi risultati per avere un quadro preciso dello stato di forma dei tuoi polmoni nel tempo.
+                            Condividi i risultati dei tuoi test in tempo reale con chi vuoi tramite Mail, WhatsApp, SMS ecc.{% endblocktrans %}</p>
+                    </div>
+                </div>
+                <div class="row col-12 order-xl-0 col-xl-9 justify-content-center">
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartoneoxi/smartoneoxi-app.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "Ready to use" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartoneoxi/Smart_One_OXY_Hand_Phone.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "Save and share your results" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4 pr-sm-0">
+                        <div class="cat--list-item">
+                            <div>
+                                <img src="{% static 'img/smartoneoxi/Spirobank-Oxi-in-Use.jpg' %}" alt="img" class="img-fluid img-rounded">
+                                <h4>{% trans "COMPLIANCE WITH ATS/ERS 2019" %}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonial4" class="testimonial testimonial-4 pt-150 pb-100 pt-xs-60 pb-xs-60">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 col-md-8 col-lg-8 ">
+                    <div class="heading heading-2 mb-5">
+                        <h2 class="heading--title">{% trans "Top reviews" %}</h2>
+                    </div>
+                </div>
+            </div>
+            {% include "includes/testimonial_slider.html" %}
+        </div>
+    </section>
+
+    <section class="pt-0">
+        <div class="container-large">
+            <div class="banner-smartoneoxi">
+                <div class="container">
+                    <div class="row justify-content-end">
+                        <div class="col-md-5 col-lg-4">
+                            <div class="banner-smartoneoxi-content" data-aos="fade">
+                                <h3>{% trans "Looking for Smart One?" %}</h3>
+                                <p class="mb-5">{% blocktrans %}If you prefer the <strong>basic version without the sensor for oximetry</strong>, you can try Smart One. Even easier to use, but same accuracy.{% endblocktrans %}</p>
+                                <a href="{{ SMARTONE.get_absolute_url }}" class="btn  btn--primary btn--rounded px-5 w-auto">{% trans "View Smart One" %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endif %}
+
+
+
+{% if product.upc == "set_turbina_boccaglio" %}
+
+<section id="interactive3" class="interactive interactive-2 interactive-3 pt-150 pt-60-xs">
+    <div class="container-large">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-12 col-lg-3">
+                <div class="banner-panel" data-aos="fade-up">
+                    <div class="num">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d6e4ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 0-2.4.6-3 1.7A3.6 3.6 0 0 0 4.6 9c-1 .6-1.7 1.8-1.7 3s.7 2.4 1.7 3c-.3 1.2 0 2.5 1 3.4.8.8 2.1 1.2 3.3 1 .6 1 1.8 1.6 3 1.6s2.4-.6 3-1.7c1.2.3 2.5 0 3.4-1 .8-.8 1.2-2 1-3.3 1-.6 1.6-1.8 1.6-3s-.6-2.4-1.7-3c.3-1.2 0-2.5-1-3.4a3.7 3.7 0 0 0-3.3-1c-.6-1-1.8-1.6-3-1.6Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    </div>
+                    <div class="panel--content">
+                        <h5>{% trans "Accurate" %}</h5>
+                        <h6>{% trans "MIR MEDICAL GUARANTEE" %}</h6>
+                        <p>{% trans "Compliant with ATS/ERS accredited Spirometry Guidelines" %}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- .interactive-panel end -->
+            <div class="col-sm-12 col-md-12 col-lg-3">
+                <div class="banner-panel" data-aos="fade-up" data-aos-delay="150">
+                    <div class="num">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d6e4ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9a4 4 0 0 0-2 7.5"></path><path d="M12 3v2"></path><path d="m6.6 18.4-1.4 1.4"></path><path d="M20 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path><path d="M4 13H2"></path><path d="M6.34 7.34 4.93 5.93"></path></svg>
+                    </div>
+                    <div class="panel--content">
+                        <h5>{% trans "Portable" %}</h5>
+                        <h6>{% trans "No Ambient Influence" %}</h6>
+                        <p>{% trans "Not affected by air pressure, humidity, temperature and viscosity" %}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- .interactive-panel end -->
+            <div class="col-sm-12 col-md-12 col-lg-3">
+                <div class="banner-panel" data-aos="fade-up" data-aos-delay="300">
+                    <div class="num">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d6e4ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+                            <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+                            <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+                            <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+                            <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+                            <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+                        </svg>
+                    </div>
+                    <div class="panel--content">
+                        <h5>{% trans "Clean" %}</h5>
+                        <h6>{% trans "No Cross Contamination" %}</h6>
+                        <p>{% trans "The sensor is psysically isolated from inspiration and expiration flows" %}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- .interactive-panel end -->
+        </div>
+        <!-- .row end -->
+    </div>
+    <!-- .container end -->
+</section>
+
+<section id="cat-list" class="cat-list bg-lightBlue text-center-xs pt-140 pt-xs-60 pb-0 position-relative">
+    <div class="watch-face watch-face-topleft position-absolute">
+        <div class="circle" style="--ca: -70deg"></div>
+        <div class="circle" style="--ca: -30deg"></div>
+        <div class="circle" style="--ca: 10deg"></div>
+        <div class="circle" style="--ca: 50deg"></div>
+        <div class="circle" style="--ca: 90deg"></div>
+        <div class="circle" style="--ca: 130deg"></div>
+        <div class="circle" style="--ca: 170deg"></div>
+        <div class="circle" style="--ca: 210deg"></div>
+        <div class="circle" style="--ca: 250deg"></div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-3 col-lg-3 mb-30-xs order-2 order-md-0">
+                <div class="divider--line"></div>
+            </div>
+            <div class="col-sm-12 col-md-9 col-lg-9">
+                <div class="heading heading-2 text--right text-center-xs mb-5">
+                    <p class="heading--subtitle text-uppercase">{% trans "Smart One and Smart One Oxi" %}</p>
+                    <h2 class="heading--title">{% trans "Compatible products" %}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-3">
+                <div class="cat--list-desc">
+                    {% blocktrans %}
+                    <p>Failure to use original MIR spare parts can compromise the quality of the measurement, resulting in distorted and improbable results.</p>
+                    <p>Trust MIR.</p>
+                    {% endblocktrans %}
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="cat--list-item">
+                            <a href="{{ SMARTONE.get_absolute_url }}">
+                                <img src="/static/img/box_smartone.jpg" alt="Box Smart One" class="img-fluid img-rounded">
+                                <h4>Smart One</h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="cat--list-item">
+                            <a href="{{ SMARTONEOXI.get_absolute_url }}">
+                                <img src="/static/img/box_smartoneoxi.jpg" alt="Box Smart One Oxi" class="img-fluid img-rounded">
+                                <h4>Smart One Oxi</h4>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="testimonial4" class="testimonial testimonial-4 pt-150 pb-100 pt-xs-60 pb-xs-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-8 col-lg-8 ">
+                <div class="heading heading-2 mb-5">
+                    <h2 class="heading--title">{% trans "Top reviews" %}</h2>
+                </div>
+            </div>
+        </div>
+        {% include "includes/testimonial_slider.html" %}
+    </div>
+</section>
+{% endif %}
+
+
+
+<!-- Dati per schema.org -->
+<meta itemprop="url" content="{{ request.META.HTTP_HOST }}{{ product.get_absolute_url }}" />
+<meta itemprop="productID" content="{{ product.upc }}">
+<meta itemprop="gtin" content="{{ product.gtin }}">
+<div itemprop="brand" itemscope itemtype="http://schema.org/Brand" >
+    <meta itemprop="name" content="Smart One" />
+    <div itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+        <meta itemprop="url" content="{{ request.META.HTTP_HOST }}static/img/logo.png" />
+    </div>
+</div>
+{% with image=product.primary_image %}
+{% oscar_thumbnail image.original "1024x1024" crop="center" as img %}
+<meta itemprop="image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ img.url }}" />
+{% endwith %}
+<div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="d-none">
+    {% purchase_info_for_product request product as session %}
+    <link itemprop="availability" href="{% if session.availability.is_available_to_buy %}http://schema.org/InStock{% else %}http://schema.org/OutOfStock{% endif %}">
+    <link itemprop="itemCondition" href="http://schema.org/NewCondition">
+    <meta itemprop="price" content="{{ session.price.incl_tax|replace_commas }}">
+    <meta itemprop="priceCurrency" content="{{ session.price.currency }}">
+</div>
+<div itemprop="manufacturer" itemscope itemtype="http://schema.org/Corporation" >
+    <meta itemprop="name" content="MIR Medical International Research" />
+    <div itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+        <meta itemprop="url" content="https://spirometry.com/static/img/mir-orange.svg" />
+    </div>
+</div>
+
+</div> <!-- end div for schema.org -->
+
+{% if user.is_staff %}
+<a class="position-fixed d-md-block" href="{% url 'dashboard:catalogue-product' pk=product.id %}" style="bottom: 1rem; right: 1rem; z-index: 2000">
+    <small><i class="fas fa-pencil-alt"></i> {% trans "Edit this product" %}</small>
+</a>
+{% endif %}
+
+
+{% comment %}
+<!-- Start of product page 
+<article class="product_page" style="border-top: 10px solid red">
+
+    <div class="row">
+
+        <div class="col-sm-6">
+            {% include "oscar/catalogue/partials/gallery.html" %}
+        </div>
+
+        <div class="col-sm-6 product_main">
+            {% if user.is_staff %}
+                <a class="float-right d-none d-md-block" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
+                    <small><i class="fas fa-pencil-alt"></i> {% trans "Edit this product" %}</small>
+                </a>
+            {% endif %}
+            <h1>{{ product.get_title }}</h1>
+
+          
+                {% include "oscar/catalogue/partials/stock_record.html" with verbose=1 %}
+           
+
+            {% iffeature "reviews" %}
+                {% include "oscar/catalogue/reviews/partials/review_stars.html" %}
+            {% endiffeature %}
+
+            <hr/>
+
+            {% if not product.is_parent %}
+              
+                    {% include "oscar/catalogue/partials/add_to_basket_form.html" %}
+             
+            {% else %}
+              
+                    <h2>{% trans 'Variants:' %}</h2>
+                    {% for child in product.children.public %}
+                        {% purchase_info_for_product request child as child_session %}
+                        {% if child_session.availability.is_available_to_buy %}
+                            <a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a><br>
+                        {% endif %}
+                    {% endfor %}
+               
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% block product_info %}
+    <div class="sub-header">
+        <h2>{% trans "Product Information" %}</h2>
+    </div>
+    <table class="table table-striped">
+        {% if product.upc %}
+        <tr>
+            <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
+        </tr>
+
+        {% purchase_info_for_product request product as session %}
+        {% if session.price.exists %}
+            <tr>
+                <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
+            </tr>
+            {% if session.price.is_tax_known %}
+                <tr>
+                    <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th>{% trans "Availability" %}</th>
+                <td>{{ session.availability.message }}</td>
+            </tr>
+        {% endif %}
+        {% for av in product.get_attribute_values %}
+            <tr>
+                <th>{{ av.attribute.name }}</th>
+                <td>{{ av.value_as_html }}</td>
+            </tr>
+        {% endfor %}
+        {% iffeature "reviews" %}
+            <tr>
+                <th>{% trans "Number of reviews" %}</th>
+                <td>{{ product.num_approved_reviews }}</td>
+            </tr>
+        {% endiffeature %}
+    </table>
+    {% endblock %}
+
+    {% iffeature "reviews" %}
+        {% block product_review %}
+        <section>
+            <div id="reviews" class="sub-header">
+                {% if product.num_approved_reviews > 3 %}
+                    <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn float-right">{% trans "See all reviews" %}</a>
+                {% endif %}
+                <h2>{% trans "Customer Reviews" %}</h2>
+            </div>
+
+            {% if product.num_approved_reviews == 0 %}
+                <p>
+                    {% if product|is_review_permitted:user %}
+                        {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                            {% blocktrans %}This product does not have any reviews yet -
+                            <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                        {% endblocktrans %}
+                    {% else %}
+                        {% trans "This product does not have any reviews yet" %}.
+                    {% endif %}
+                </p>
+            {% else %}
+                <ol class="list-unstyled review-list">
+                    {% for review in product.reviews.approved.all|slice:":3" %}
+                        <li>
+                        {% include 'oscar/catalogue/partials/review.html' %}
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </section>
+        {% endblock product_review %}
+    {% endiffeature %}
+
+    {% with recommended_products=product.sorted_recommended_products|slice:":6" %}
+        {% if recommended_products %}
+            <div class="sub-header">
+                <h2>{% trans "Recommended items" %}</h2>
+            </div>
+            <ul class="row list-unstyled mx-0">
+                {% for product in recommended_products %}
+                <li class="col-sm-4 col-md-3 col-lg-3">
+                    {% render_product product %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% recently_viewed_products current_product=product %}
+
+</article> -->
+{% endcomment %}
+
+
+{% endblock content %}
+
+{% block extrascripts %}
+    {{ block.super }}
+    <!-- <script src="/static/js/juxtapose.min.js"></script> -->
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            $(document).ready(function() {
+
+                function addBothProductsOne(){
+                    $.ajax({
+                        type:'POST',
+                        url:'/add_both_one/',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                        },
+                    })
+                    .done(function(response) {
+                       window.location = '/shop/basket/';
+                    })
+                    .fail(function( jqXHR, textStatus ) {
+                        $('#modalFormError').modal('show');
+                    });
+                }
+                function addBothProductsOxi(){
+                    $.ajax({
+                        type:'POST',
+                        url:'/add_both_oxi/',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                        },
+                    })
+                    .done(function(response) {
+                       window.location = '/shop/basket/';
+                    })
+                    .fail(function( jqXHR, textStatus ) {
+                        $('#modalFormError').modal('show');
+                    });
+                }
+                $('#addBothToCartOne').on('touch click', function(e){
+                    e.preventDefault();
+                    addBothProductsOne();
+                })
+                $('#addBothToCartOxi').on('touch click', function(e){
+                    e.preventDefault();
+                    addBothProductsOxi();
+                })
+            });
+        });
+
+
+    $(window).scroll(function() {
+        $(".heading--title").each(function(){
+            var top_of_element = $(this).offset().top;
+            var bottom_of_element = $(this).offset().top + $(this).outerHeight();
+            var bottom_of_screen = $(window).scrollTop() + window.innerHeight;
+            var top_of_screen = $(window).scrollTop();
+
+            if((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element)){
+                $(this).addClass('tlt');
+                $(this).textillate({ in: { effect: 'fadeIn', delay: 20 } });
+            }
+        });
+    });
+
+
+
+        
+        
+
+
+
+
+
+
+    </script>
+    <script type="application/ld+json">
+        {% purchase_info_for_product request product as session %}
+        {% get_price_smartone request as price_smartone %}
+        {% get_price_smartoneoxi request as price_smartoneoxi %}
+
+        {
+          "@context": "http://schema.org",
+          "@type": "Product",
+          "image": {% with image=product.primary_image %}{% oscar_thumbnail image.original "600x600" crop="center" as img %}"{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{{ img.url }}"{% endwith %},
+          "name": "{{ product.get_title }}",
+          "brand": {
+              "@type": "Brand",
+              "logo": "{{ request.META.HTTP_HOST }}static/img/logo-smartone.jpg",
+              "name": "Smart One"
+          },
+          "description": "{% if product.get_title == 'Smart One' %}{% trans 'description_smart_one' %}{% endif %}{% if product.get_title == 'Smart One Oxi' %}{% trans 'description_smart_one_oxi' %}{% endif %}",
+          "productID": "{{ product.upc }}",
+          "gtin": "{{ product.gtin }}",
+          "url": "{{ request.META.HTTP_HOST }}{{ product.get_absolute_url }}",
+          "logo": "{{ request.META.HTTP_HOST }}static/img/logo.png",
+          {% if product.get_title == "Smart One" %}
+          "isRelatedTo": {
+            "@type": "Product",
+            "name": "Smart One Oxi",
+            "url": "{{SMARTONEOXI.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartoneoxi }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          {% endif %}
+          {% if product.get_title == "Smart One Oxi" %}
+          "isRelatedTo": {
+            "@type": "Product",
+            "name": "Smart One",
+            "url": "{{SMARTONE.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartone }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          {% endif %}
+          {% if product.upc == "set_turbina_boccaglio" %}
+          "isAccessoryOrSparePartFor": {
+            "@type": "Product",
+            "name": "Smart One",
+            "url": "{{SMARTONE.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartone }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          "isAccessoryOrSparePartFor": {
+            "@type": "Product",
+            "name": "Smart One Oxi",
+            "url": "{{SMARTONEOXI.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartoneoxi }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          "isConsumableFor": {
+            "@type": "Product",
+            "name": "Smart One",
+            "url": "{{SMARTONE.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartone }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          "isConsumableFor": {
+            "@type": "Product",
+            "name": "Smart One Oxi",
+            "url": "{{SMARTONEOXI.get_absolute_url}}",
+            "offers": {
+                "@type": "Offer",
+                "availability": "http://schema.org/InStock",
+                "price": "{{ price_smartoneoxi }}",
+                "priceCurrency": "{{ session.price.currency }}",
+                "itemCondition": "http://schema.org/NewCondition"
+              }
+          },
+          {% endif %}
+          "offers": {
+            "@type": "Offer",
+            "availability": "http://schema.org/InStock",
+            "price": "{{ session.price.incl_tax|replace_commas }}",
+            "priceCurrency": "{{ session.price.currency }}",
+            "itemCondition": "http://schema.org/NewCondition"
+          }
+        }
+        </script>
+{% endblock %}
+
+{% block extratracking %}
+{{ block.super }}
+{% purchase_info_for_product request product as session %}
+
+if(typeof(fbq) !== 'undefined'){
+    fbq('track', 'ViewContent', {
+        content_ids: ['{% if product.parent %}{{ product.parent.upc }}{% else %}{{ product.upc }}{% endif %}'],
+        {% if product.categories %}content_category: '{% spaceless %}{% for c in product.categories.all %}{{c.name|striptags|remove_newlines}}{% if not forloop.last %} > {% endif %}{% endfor %}{% endspaceless %}',{% endif %}
+        content_type: 'product',
+        contents: [
+        {
+            id: '{% if product.parent %}{{ product.parent.upc }}{% else %}{{ product.upc }}{% endif %}',
+            quantity: 1
+        }
+        ],
+        value: {{ session.price.incl_tax|replace_commas }},
+        currency: '{{ session.price.currency|escapejs }}'
+    });
+}
+
+$('.add-to-cart-event').on('click touch', function(){
+    if(typeof(fbq) !== 'undefined'){
+        fbq('track', 'AddToCart', {
+        content_name: "{{product.get_title}}",
+        content_ids: ['{{ product.upc }}'],
+        {% if product.categories %}content_category: '{% spaceless %}{% for c in product.categories.all %}{{c.name|striptags|remove_newlines}}{% if not forloop.last %} > {% endif %}{% endfor %}{% endspaceless %}',{% endif %}
+        contents: [
+            {
+            id: '{{ product.upc }}',
+            quantity: 1
+            }
+        ],
+        content_type: 'product',
+        value: {{ session.price.incl_tax|replace_commas }},
+        currency: '{{ session.price.currency|escapejs }}'
+        });
+    }
+});
+{% endblock %}
+
+{% block extratracking_gtag %}
+{{ block.super }}
+{% purchase_info_for_product request product as session %}
+if(typeof(gtag) !== 'undefined'){
+    gtag('event', 'view_item', {
+        "items": [
+            {
+                "item_id": "{% if product.parent %}{{ product.parent.upc }}{% else %}{{ product.upc }}{% endif %}",
+                "item_name": "{{ product.get_title }}",
+                "affiliation": '{{ shop_name|escapejs }}',
+                {% spaceless %}{% for c in product.categories.all %}
+                "item_category{% if not forloop.first %}{{ forloop.counter }}{% endif %}": "{{c.name|striptags|remove_newlines}}",{% endfor %}{% endspaceless %}
+                "google_business_vertical": "retail",
+                "currency": "{{ session.price.currency|escapejs }}",
+                "item_brand": "MIR",
+                "price": '{{ session.price.incl_tax|replace_commas }}'
+            }
+        ]
+    });
+}
+
+// Add to cart event
+$('.add-to-cart-event').on('click touch', function(){
+    if(typeof(gtag) !== 'undefined'){
+        gtag('event', 'add_to_cart', {
+            "items": [
+                {
+                "item_id": "{% if product.parent %}{{ product.parent.upc }}{% else %}{{ product.upc }}{% endif %}",
+                "item_name": "{{ product.get_title }}",
+                "affiliation": '{{ shop_name|escapejs }}',
+                {% spaceless %}{% for c in product.categories.all %}
+                "item_category{% if not forloop.first %}{{ forloop.counter }}{% endif %}": "{{c.name|striptags|remove_newlines}}",{% endfor %}{% endspaceless %}
+                "currency": "{{ session.price.currency|escapejs }}",
+                "item_brand": "MIR",
+                "price": '{{ session.price.incl_tax|replace_commas }}'
+                }
+            ]
+        });
+
+        {% comment %}
+        {% if request.META.HTTP_HOST == 'mirsmartone.com' and not user.is_superuser %}
+        gtag('event', 'conversion', {'send_to': 'AW-10940014376/XSfZCOXrrcoDEKi-zeAo'});
+        {% endif %}
+        {% endcomment %}
+    }
+});
+{% endblock %}

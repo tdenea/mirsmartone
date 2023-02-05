@@ -1,0 +1,220 @@
+{% extends "oscar/checkout/layout.html" %}
+{% load currency_filters %}
+{% load static i18n %}
+{% load image_tags %}
+{% load purchase_info_tags %}
+
+
+{% block title %}
+    {% trans "Checkout" %} | {{ block.super }}
+{% endblock %}
+
+{% block header_wrapper %}{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' %}
+{% endblock %}
+
+{% block content %}
+
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="row shipping-payment align-items-start">
+        {% block shipping_address %}
+            <div class="col-sm-12 col-md-7 col-lg-8 mb-5">
+                <div class="cart-total-amount card px-5 py-5">
+                <h3 class="" style="font-size: 24px;">{% trans "Shipping & Payment" %}</h3>
+                {% if shipping_address %}
+                    <div class="">
+                        <h6 class="w-100 mb-3 mt-2">
+                          {% trans "Shipping address" %}
+                          {% block shipping_address_actions %}
+                            <a href="{% url 'checkout:shipping-address' %}" class="float-right change-link btn--link">
+                                {% trans "Change" %}
+                            </a>
+                        {% endblock %}</h6>
+                        <address>
+                            {% for field in shipping_address.active_address_fields %}
+                            <span {% if forloop.first %}class="text-bold"{% endif %}>{{ field }}</span>{% if address.active_address_fields|length == 8 %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 3 %}<br/> {% elif forloop.last %}{% else %},{% endif %}{% else %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 2 %}<br/> {% elif forloop.last %}{% else %},{% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </address>
+
+                        {% if shipping_address.phone_number %}
+                            <!-- <h5>{% trans "Contact" %}</h5> -->
+                            <p class="mb-0">
+                                {% trans "Phone" %}: {{ shipping_address.phone_number }}
+                                {% if guest_email %}
+                                    <br/>{% trans "Email" %}: {{ guest_email }}
+                                {% endif %}
+                            </p>
+                        {% endif %}
+
+                        {% if shipping_address.notes %}
+                            <!-- <h5>{% trans "Instructions" %}</h5> -->
+                            <p class="mb-0">{{ shipping_address.notes|linebreaks }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if billing_address %}
+                    <div class="">
+                        <h6 class="w-100 mb-3 mt-2">
+                          {% trans "Dati di fatturazione" %}
+                          {% block billing_address_actions %}
+                            <a href="{% url 'checkout:billing-address' %}" class="float-right change-link btn--link">
+                                {% trans "Change" %}
+                            </a>
+                            {% endblock %}
+                        </h6>
+                        <address>
+                            {% for field in billing_address.active_address_fields %}
+                            <span {% if forloop.first %}class="text-bold"{% endif %}>{{ field }}</span>{% if address.active_address_fields|length == 8 %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 3 %}<br/> {% elif forloop.last %}{% else %},{% endif %}{% else %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 2 %}<br/> {% elif forloop.last %}{% else %},{% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </address>
+
+                        {% if billing_address.phone_number %}
+                            <!-- <h5>{% trans "Contact" %}</h5> -->
+                            <p class="mb-0">
+                                {% trans "Phone" %}: {{ billing_address.phone_number }}
+                                {% if guest_email %}
+                                    <br/>{% trans "Email" %}: {{ guest_email }}
+                                {% endif %}
+                            </p>
+                        {% endif %}
+
+                        {% if billing_address.notes %}
+                            <!-- <h5>{% trans "Instructions" %}</h5> -->
+                            <p class="mb-0">{{ billing_address.notes|linebreaks }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if shipping_method %}
+                    <div class="">
+                        <h6 class="w-100 mb-3 mt-2">
+                          {% trans "Shipping method" %}
+                          {% comment %}
+                          {% block shipping_method_actions %}
+                            <a href="{% url 'checkout:shipping-method' %}" class="float-right change-link btn--link">
+                                {% trans "Change" %}
+                            </a>
+                          {% endblock %}
+                          {% endcomment %}
+                        </h6>
+                        <p class="mb-0">{{ shipping_method.name }}
+                            {% if shipping_method.description %}
+                                - {{ shipping_method.description|safe }}
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+                
+                {% block payment_method %}
+                    <div class="">
+                        <h6 class="w-100 mb-3 mt-2">{% trans "Payment" %}</h6>
+                        {% if payment_method == 'paypal'%}
+                        <p class="mb-0">{% trans 'Credit Card / PayPal' %}</p>
+                        {% endif %}
+                    </div>
+                {% endblock payment_method %}
+                </div>
+            </div>
+        {% endblock shipping_address %}
+        
+        {% block billing_address %}
+        {% endblock billing_address %}
+
+    {% block order_contents %}
+    <div class="col-md-5 col-lg-4">
+        <div class="cart-total-amount cart-product-action card bg-white" id="order-summary">
+            
+                {% comment %} 
+                {% block order_contents_actions %}
+                    <a href="{% url 'basket:summary' %}" class="float-right">
+                        {% trans "Edit order contents" %}
+                    </a>
+                {% endblock %}
+                {% endcomment %}
+
+                <h5 class="text-center pb-3" style="margin-top: -3px;">{% trans "Order summary" %}</h5>
+           
+            <!-- <div class="basket-title">
+                <div class="row">
+                    <p class="col-sm-9 h4">{% trans "Item" %}</p>
+                    <p class="col-sm-1 h4 text-center">{% trans "Quantity" %}</p>
+                    <p class="col-sm-2 h4 text-right">{% trans "Total" %}</p>
+                </div>
+            </div> -->
+            {% for line in basket.all_lines %}
+                {% purchase_info_for_line request line as session %}
+                <div class="basket-items cart--products">
+                    <div class="row">
+                        <div class="col-md-5 col-lg-4">
+                            <div class="image_container w-100">
+                                {% with image=line.product.primary_image %}
+                                    {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+                                    <a href="{{ form.instance.product.get_absolute_url }}">
+                                        <img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
+                                    </a>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-md-7 col-lg-8">
+                            <p class="product-title mb-0"><strong><a href="{{ line.product.get_absolute_url }}">{% if LANGUAGE_CODE == 'it' %}{{ line.product.title }}{% else %}{{ line.product.title_en }}{% endif %}</a></strong></p>
+                            <!-- <span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span> -->
+                            <p class="mb-10">{% trans "Quantity" %}: {{ line.quantity }}</p>
+                            <p class="text-bold">
+                                {% if not show_tax_separately and line.is_tax_known %}
+                                    {{ line.line_price_incl_tax|currency:basket.currency }}
+                                {% else %}
+                                    {{ line.line_price_excl_tax|currency:basket.currency }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+            <div class="checkout--panel px-0 pb-0">
+                    <!-- <div class="sub-header">
+                        <h2>{% trans 'Totals' %}</h2>
+                    </div> -->
+                    {% include 'oscar/basket/partials/basket_totals.html' %}
+
+                    {% block place_order %}
+                    {% endblock place_order %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock order_contents %}
+ </div>
+
+    {% block shipping_method %}
+    {% endblock shipping_method %}
+
+    {% block payment_details %}
+    {% endblock payment_details %}
+
+
+{% endblock content %}
+
+{% block extratracking %}
+    {{ block.super }}
+    {% block tracking_checkout %}
+    {% endblock %}
+{% endblock %}
+
+{% block extratracking_gtag %}
+{{ block.super }}
+{% block tracking_checkout_gtag %}
+{% endblock %}
+{% endblock %}

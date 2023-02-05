@@ -1,0 +1,145 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+{% load purchase_info_tags poll_extras %}
+
+{% block title %}
+    {% trans "Shipping address" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=1 %}
+{% endblock %}
+
+{% block checkout_title %}{% endblock %}
+
+
+
+{% block shipping_address %}
+
+<div class="col-sm-12 col-md-7 col-lg-8">
+    <div class="card py-5 px-3 px-sm-5">
+       
+        <h3 class="mb-3" style="font-size: 24px;">{% trans "Where should we ship to?" %}</h3>
+        
+        {% if user.is_authenticated %}
+            {% if addresses %}
+            <hr>
+                <h6 class="mt-30">{% trans "An address from your address book?" %}</h6>
+                <div class="choose-block">
+                    <div class="row">
+                        {% for address in addresses %}
+                            {% block select_address_form %}
+                                <div class="col-lg-12  mb-20">
+                                    <div class="cart-total-amount px-0 py-4 position-relative d-flex align-items-start justify-content-between flex-column flex-lg-row" style="border-bottom: 1px solid #e9f0f6;">
+                                        <address class="pr-5">
+                                            {% block select_address_fields %}
+                                                {% for field in address.active_address_fields %}
+                                                    <span {% if forloop.first %}class="text-bold"{% endif %}>{{ field }}</span>{% if address.active_address_fields|length == 8 %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 3 %}<br/> {% elif forloop.last %}{% else %},{% endif %}{% else %}{% if forloop.first %}<br/>{% elif forloop.revcounter == 2 %}<br/> {% elif forloop.last %}{% else %},{% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endblock %}
+                                        </address>
+                                        <form action="{% url 'checkout:shipping-address' %}" method="post" id="select_shipping_address_{{ address.id }}" class="col-lg-5 px-0">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="ship_to" />
+                                            <input type="hidden" name="address_id" value="{{ address.id }}" />
+                                            {% if address.is_default_for_shipping %}
+                                            <button type="submit" class="btn btn--primary btn-wrap w-100 px-4 d-flex align-items-center justify-content-center ship-address h-auto mt-2" data-loading-text="{% trans 'Saving...' %}">{% trans "Ship to your default shipping address" %}</button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn--primary btn-wrap w-100 px-4 d-flex align-items-center justify-content-center mt-2" data-loading-text="{% trans 'Saving...' %}">{% trans "Ship to this address" %}</button>
+                                            {% endif %}
+
+                                            <div class="btn-group address-controls d-flex justify-content-lg-end mt-2">
+                                                <a href="{% url 'checkout:user-address-update' pk=address.id %}" class="btn--link c-smartone">{% trans "Edit" %}</a> <span class="mx-2">|</span> 
+                                                <a href="{% url 'checkout:user-address-delete' pk=address.id %}" class="btn-remove-address btn--link c-smartone">{% trans "Delete" %}</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if forloop.counter|divisibleby:2 %}
+                                    </div><div class="row">
+                                {% endif %}
+                            {% endblock %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <h6 class="mt-30">{% trans "Or a new address?" %}</h6>
+            {% endif %}
+        {% endif %}
+
+        {% block new_address_form %}
+            <div class="cart-shiping">
+                <form action="{% url 'checkout:shipping-address' %}" method="post" id="new_shipping_address">
+                    {% csrf_token %}
+                    {% include "oscar/partials/form_fields.html" with form=form  %}
+                    <div class="d-flex flex-column flex-sm-row justify-content-between mt-30">
+                        <a href="{% url 'basket:summary' %}" class="btn btn--secondary btn--rounded text-uppercase px-4 w-auto mb-2">{% trans "return to basket" %}</a>
+                        <button type="submit" class="btn btn--primary px-4 w-auto mb-2" data-loading-text="{% trans 'Continuing...' %}">{% if addresses %}{% trans "Save new address" %}{% else %}{% trans "Continue" %}{% endif %}</button>
+                    </div>
+                </form>
+            </div>
+        {% endblock %}
+    </div>
+</div>
+
+{% endblock shipping_address %}
+
+{% block shipping_method %}{% endblock %}
+{% block payment_method %}{% endblock %}
+
+{% block tracking_checkout %}
+{% if not user.is_superuser and request.META.HTTP_HOST == 'mirsmartone.com' %}
+if(typeof(fbq) !== 'undefined') fbq('track', 'InitiateCheckout');
+{% endif %}
+{% endblock %}
+
+{% block tracking_checkout_gtag %}
+if(typeof(gtag) !== 'undefined'){
+    gtag('event', 'set_checkout_option', {
+       'event_label': "Shipping address",
+       "checkout_step": 1,
+       "checkout_option": "Shipping address"
+    });
+    
+    gtag('event', 'begin_checkout', {
+        "items": [
+            {% for line in request.basket.all_lines %}
+            {% purchase_info_for_product request line.product as session %}
+            {
+                "item_id": "{% if line.product.parent %}{{ line.product.parent.upc }}{% else %}{{ line.product.upc }}{% endif %}",
+                "item_name": "{{ line.product.get_title }}",
+                "affiliation": '{{ shop_name|escapejs }}',
+                "index": {{ forloop.counter }},
+                {% spaceless %}{% for c in line.product.categories.all %}
+                "item_category{% if not forloop.first %}{{ forloop.counter }}{% endif %}": "{{c.name|striptags|remove_newlines}}",{% endfor %}{% endspaceless %}
+                "google_business_vertical": "retail",
+                "currency": "{{ session.price.currency|escapejs }}",
+                "item_brand": "MIR",
+                'quantity': '{{ line.quantity|escapejs }}',
+                "price": '{{ session.price.incl_tax|replace_commas }}'
+            }{% if not forloop.last and request.basket.all_lines|length > 1 %},{% endif %}
+            {% endfor %}
+        ]
+    });
+}
+{% endblock %} 
+
+
+{% block extra_js %}
+<script>
+    // per rendere carine le checkbox
+    var fc1 = $('#id_terms_and_conditions').closest('.form-check');
+    fc1.addClass('custom-control custom-checkbox form-check-1');
+    $('#id_terms_and_conditions').addClass('custom-control-input');
+    $('label[for="id_terms_and_conditions"]').addClass('custom-control-label');
+    $('#id_terms_and_conditions').detach().prependTo('.form-check-1');
+    $('label[for="id_terms_and_conditions"]').html('{% blocktrans %}I accept <a href="/{{ LANGUAGE_CODE }}/terms-conditions/">General Terms and Conditions of Sale</a>{% endblocktrans %}');
+
+    var fc2 = $('#id_privacy').closest('.form-check');
+    fc2.addClass('custom-control custom-checkbox form-check-2');
+    $('#id_privacy').addClass('custom-control-input');
+    $('label[for="id_privacy"]').addClass('custom-control-label');
+    $('#id_privacy').detach().prependTo('.form-check-2');
+    $('label[for="id_privacy"]').html('{% blocktrans %}I have read the privacy policy at <a href="/{{ LANGUAGE_CODE }}/e-commerce-policy/">this link</a>{% endblocktrans %}');
+</script>
+{% endblock %}

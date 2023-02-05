@@ -1,0 +1,32 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Edit address" %} | {{ block.super }}
+{% endblock title %}
+
+{% block order_contents %}{% endblock %}
+{% block shipping_method %}{% endblock %}
+{% block payment_method %}{% endblock %}
+{% block payment_details %}{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=1 %}
+{% endblock %}
+
+{% block checkout_title %}{% trans "Edit address" %}{% endblock %}
+
+{% block shipping_address %}
+<div class="col-sm-12">
+    <div class="contact-3">
+        <form id="update_user_address" method="post">
+            {% csrf_token %}
+            {% include "oscar/partials/form_fields.html" with form=form %}
+            <div class="d-flex flex-column flex-sm-row justify-content-between">
+                <a class="btn btn--secondary w-auto px-4 mb-2" href="{% url 'checkout:shipping-address' %}">{% trans "cancel" %}</a>
+                <button type="submit" class="btn btn--primary w-auto px-4 mb-2" data-loading-text="{% trans 'Saving...' %}">{% trans "Save" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock shipping_address %}

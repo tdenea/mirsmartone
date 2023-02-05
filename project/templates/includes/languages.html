@@ -1,0 +1,50 @@
+{% load i18n static poll_extras %}
+
+{% get_current_language as LANGUAGE_CODE %}
+<div class="dropdown-item">
+    <form class="form-lang" action="{% url 'set_language' %}" method="post" itemprop="potentialAction" itemscope itemtype="https://schema.org/UpdateAction">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path|strip_lang }}" />
+        <input name="language" type="hidden" value="it" />
+        <input type="submit" class="lang {% if LANGUAGE_CODE == 'it' %}lang--active{% endif %}" value="IT" />
+        <meta itemprop="name" content="{% trans 'Imposta lingua del sito in' %} {% trans 'Italiano' %}" />
+    </form>
+</div>
+<div class="dropdown-item">
+    <form class="form-lang" action="{% url 'set_language' %}" method="post" itemprop="potentialAction" itemscope itemtype="https://schema.org/UpdateAction">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path|strip_lang }}" />
+        <input name="language" type="hidden" value="en" />
+        <input type="submit" class="lang {% if LANGUAGE_CODE == 'en' %}lang--active{% endif %}" value="EN" />
+        <meta itemprop="name" content="{% trans 'Set website language in' %} {% trans 'English' %}" />
+    </form>
+</div>
+{% comment %}
+<div class="dropdown-item">
+    <form class="form-lang" action="{% url 'set_language' %}" method="post" itemprop="potentialAction" itemscope itemtype="https://schema.org/UpdateAction">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path|strip_lang }}" />
+        <input name="language" type="hidden" value="es" />
+        <input type="submit" class="lang {% if LANGUAGE_CODE == 'es' %}lang--active{% endif %}" value="ES" />
+        <meta itemprop="name" content="{% trans 'Establecer el idioma del sitio web en' %} {% trans 'Español' %}" />
+    </form>
+</div>
+<div class="dropdown-item">
+    <form class="form-lang" action="{% url 'set_language' %}" method="post" itemprop="potentialAction" itemscope itemtype="https://schema.org/UpdateAction">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path|strip_lang }}" />
+        <input name="language" type="hidden" value="fr" />
+        <input type="submit" class="lang {% if LANGUAGE_CODE == 'fr' %}lang--active{% endif %}" value="FR" />
+        <meta itemprop="name" content="{% trans 'Définir la langue du site web en' %} {% trans 'Français' %}" />
+    </form>
+</div>
+<div class="dropdown-item">
+    <form class="form-lang" action="{% url 'set_language' %}" method="post" itemprop="potentialAction" itemscope itemtype="https://schema.org/UpdateAction">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path|strip_lang }}" />
+        <input name="language" type="hidden" value="de" />
+        <input type="submit" class="lang {% if LANGUAGE_CODE == 'de' %}lang--active{% endif %}" value="DE" />
+        <meta itemprop="name" content="{% trans 'Stellen Sie die Sprache der Website auf Deutsch ein' %}" />
+    </form>
+</div>
+{% endcomment %}

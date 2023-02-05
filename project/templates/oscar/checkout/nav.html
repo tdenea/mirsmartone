@@ -1,0 +1,48 @@
+{% load i18n %}
+
+<nav class="navbar navbar-static-top nav-checkout navbar-expand-md bg-lightBlue mb-5" style="border-top: 1px solid #d6e4ef">
+    <ul class="navbar-nav w-100 d-flex align-items-center justify-content-between flex-row">
+    {% spaceless %}
+        <li class="nav-item step1 {% if step == 1 %}active{% else %}{% if step == 2 %}previous{% else %}{% if step > 1 %}visited{% else %}disabled{% endif %}{% endif %}{% endif %}">
+            {% if step == 2 or step == 3 or step == 4 %}
+                <a href="{% url 'checkout:shipping-address' %}" class="nav-link">
+                    <!-- <i class="fas fa-chevron-right"></i> -->
+                    <span class="d-inline-block">
+                        1. <span class="d-none d-md-inline-block">{% trans "Shipping address" %}</span>
+                    </span>
+                </a>
+            {% else %}
+                <span class="navbar-text">
+                    1.  <span class="d-none d-md-inline-block">{%  trans "Shipping address" %}</span>
+                </span>
+            {% endif %}
+        </li>
+
+        <li class="nav-item {% if step == 2 %}active{% else %}disabled{% endif %}">
+            {% if step == 3 or step == 4 %}
+            <a href="{% url 'checkout:billing-address' %}" class="nav-link">
+                <span class="navbar-text">
+                    2.  <span class="d-none d-md-inline-block">{% trans "Billing details" %}</span>
+                </span>
+            </a>
+            {% else %}
+            <span class="navbar-text">
+                2.  <span class="d-none d-md-inline-block">{% trans "Billing details" %}</span>
+            </span>
+            {% endif %}
+        </li>
+
+        <li class="nav-item step4 {% if step == 4 %}active{% else %}disabled{% endif %} ">
+            <span class="navbar-text">
+                3.  <span class="d-none d-md-inline-block">{% trans "Preview details" %}</span>
+            </span>
+        </li>
+
+        <li class="nav-item step5 {% if step == 5 %}active{% else %}disabled{% endif %} ">
+            <span class="navbar-text">
+                4.  <span class="d-none d-md-inline-block">{% trans "Order Confirmation" %}</span>
+            </span>
+        </li>
+    {% endspaceless %}
+  </ul><!-- /navbar-inner -->
+</nav><!-- /navbar -->
